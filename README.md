@@ -5,7 +5,7 @@ The Platypus Arduino Library provides a standard library for interacting with Pl
 
 ### Installation ###
 
-Simply [download this repository](archive/master.zip) and extract it into a folder named `Platypus` in the `libraries` sub-directory of your sketchbook directory.  You may need to create the `libraries` directory if this is your first library.
+Simply [download this repository](https://github.com/PlatypusLLC/Arduino/archive/master.zip) and extract it into a folder named `Platypus` in the `libraries` sub-directory of your sketchbook directory.  You may need to create the `libraries` directory if this is your first library.
 
 After restarting the Arduino IDE, you should now see **Platypus** under **Sketch > Import > Library**  directory inside of the libraries sub-directory of your sketchbook directory.
 
