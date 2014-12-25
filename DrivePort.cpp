@@ -1,13 +1,13 @@
-#include "Multiport.h"
+#include "DrivePort.h"
 
 using namespace platypus;
 
-Multiport::Multiport()
+DrivePort::DrivePort()
 {
     // TODO: fill this in.
 }
 
-Multiport::~Multiport()
+DrivePort::~DrivePort()
 {
     // TODO: fill this in.
 }
