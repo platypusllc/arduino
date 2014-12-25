@@ -13,11 +13,11 @@
 #include "Board.h"
 
 // ADK USB Host configuration 
-char applicationName[] = "Platypus Server"; // the app on Android
-char accessoryName[] = "Platypus Control Board"; // your Arduino board
+char applicationName[] = "Platypus Server"; // the Android app
+char accessoryName[] = "Platypus Controller"; // the Arduino app
 char companyName[] = "Platypus LLC";
-char versionNumber[] = "3.0";
-char serialNumber[] = "3";
+char versionNumber[] = "4.0.1";
+char serialNumber[] = "4";
 char url[] = "http://senseplatypus.com";
 
 // ADK USB Host
