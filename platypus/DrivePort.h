@@ -11,33 +11,28 @@
 #ifndef PLATYPUS_DRIVE_PORT_H
 #define PLATYPUS_DRIVE_PORT_H
 
-#include "Board.h"
-
 namespace platypus
 {
-    class DrivePort : public Configurable
+    class DrivePort
     { 
     public:
-        void begin();
-        void end();
-        virtual void loop();
-
-        virtual void arm() = 0;
-        void command(float cmd);
-        float command();
+        virtual void command(float cmd);
+        virtual float command() const;
         
-        void enable(bool enabled);
-        bool enabled();
+        virtual bool isPowered() const;
+        virtual void power(bool enabled);
+        virtual void powerOn();
+        virtual void powerOff();
         
-        void enable();
-        void disable();
-        
-        float current();
+        virtual float current();
 
     protected:
-        DrivePort(int channel);
+        DrivePort() {}
+        virtual ~DrivePort() = 0;
+
+    private:
         DrivePort(const &DrivePort);
-        virtual ~DrivePort();
+        DrivePort& operator=(const DrivePort&);
     };
 }
 

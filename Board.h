@@ -80,4 +80,5 @@ namespace board
   const int PWR_INT = 44;
   const int PWR_KILL = 46;
 }
+
 #endif // PLATYPUS_BOARD_H
