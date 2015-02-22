@@ -1,4 +1,5 @@
 #include "Controller.h"
+#include "Board.h"
 
 class LedImpl : public platypus::Led {
 private:

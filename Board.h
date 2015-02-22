@@ -16,28 +16,28 @@ namespace board
   // Board type definitions
   typedef struct LED_t 
   { 
-    int R;
-    int G;
-    int B;
+    int r;
+    int g;
+    int b;
   };
   
   typedef struct Motor_t 
   { 
-    int ENABLE;
-    int SERVO;
-    int CURRENT;
+    int enable;
+    int servo;
+    int current;
   };
   
   typedef struct Sensor_t
   {
-    int RX_DISABLE;
-    int TX_ENABLE;
-    int RS485_TE;
-    int RS485_232;
-    int GPIO[4];
-    int PWR_ENABLE;
-    int PWR_CURRENT;
-    int ANALOG;
+    int rx_disable;
+    int tx_enable;
+    int rs485_te;
+    int rs485_232;
+    int gpio[4];
+    int pwr_enable;
+    int pwr_current;
+    int analog;
   };
 
   enum GPIO

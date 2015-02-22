@@ -32,25 +32,29 @@ namespace Platypus
     class MultiPort
     {
     public:
-        virtual void beginSerial(int baud, Serial::Mode mode,
+        virtual bool beginSerial(int baud, Serial::Mode mode,
                                  bool tx_enabled=false, bool rx_enabled=false);
         virtual void endSerial();
         virtual Stream &serial() const;
 
-        virtual void beginAnalog(float scale=1.0, float offset=0.0,
+        virtual bool beginAnalog(float scale=1.0, float offset=0.0,
                                  float min_val=-INF, float max_val=INF);
         virtual void endAnalog();
         virtual float analog() const;
 
-        virtual void beginDigital(Multi::Pin pin, bool is_output, int initial_value);
+        virtual bool beginDigital(Multi::Pin pin, bool is_output, int initial_value);
         virtual void endDigital(Multi::Pin pin);
         virtual bool read(Multi::Pin pin) const;
         virtual void write(Multi::Pin pin, bool value);
 
         virtual bool isPowered() const;
-        virtual void power(bool enable);
+        virtual void power(bool isPowered);
         virtual void powerOn();
         virtual void powerOff();
+
+        virtual float current() const;
+
+        virtual void reset();
 
     protected:
         MultiPort() {}

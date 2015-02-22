@@ -20,11 +20,13 @@ namespace platypus
         virtual float command() const;
         
         virtual bool isPowered() const;
-        virtual void power(bool enabled);
+        virtual void power(bool isPowered);
         virtual void powerOn();
         virtual void powerOff();
         
         virtual float current();
+
+        virtual void reset();
 
     protected:
         DrivePort() {}
