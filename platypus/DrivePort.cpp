@@ -2,20 +2,6 @@
 #include "Board.h"
 #include <Servo.h>
 
-class DrivePortImpl
-: public platypus::DrivePort
-{
-public:
-    void begin(int port);
-    void end();
-
-private:
-    bool _isPowered;
-    float _command;
-    Servo _servo;
-    int _port;
-};
-
 DrivePortImpl::DrivePortImpl(int port)
 : _isPowered(false)
 , _command(0)
@@ -46,7 +32,7 @@ bool DrivePortImpl::isPowered() const
 
 void DrivePortImpl::power(bool isPowered)
 {
-    digitalWrite(MOTOR[_port], isPowered);
+    digitalWrite(platypus::board::MOTOR[_port], isPowered);
     _isPowered = isPowered;
 }
 
@@ -62,9 +48,9 @@ void DrivePortImpl::powerOff()
         
 float DrivePortImpl::current()
 {
-    digitalWrite(board.MOT_SENSE, HIGH);
-    int result = analogRead();
-    digitalWrite(board.MOT_SENSE, LOW);
+    digitalWrite(platypus::board::MOT_SENSE, HIGH);
+    int result = analogRead(platypus::board::MOTOR[_port].CURRENT);
+    digitalWrite(platypus::board::MOT_SENSE, LOW);
     return (float)result / 3.3;
 }
 

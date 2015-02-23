@@ -1,40 +1,24 @@
 /**
- * Platypus Controller DrivePort
- * =============================
- *
- * This class represents the functionality of one of the driveports on a
- * Platypus Controller.  The driveport can be configured to command a servo or
- * motor controller such as an ESC.
- *
  * Copyright (c) 2014, Platypus LLC. All rights reserved.
  */
 #ifndef PLATYPUS_DRIVE_PORT_H
 #define PLATYPUS_DRIVE_PORT_H
 
+#include "platypus.h"
+
 namespace platypus
 {
-    class DrivePort
-    { 
+    class DrivePortImpl : public platypus::DrivePort
+    {
     public:
-        virtual void command(float cmd);
-        virtual float command() const;
-        
-        virtual bool isPowered() const;
-        virtual void power(bool isPowered);
-        virtual void powerOn();
-        virtual void powerOff();
-        
-        virtual float current();
-
-        virtual void reset();
-
-    protected:
-        DrivePort() {}
-        virtual ~DrivePort() = 0;
+        void begin(int port);
+        void end();
 
     private:
-        DrivePort(const &DrivePort);
-        DrivePort& operator=(const DrivePort&);
+        float _command;
+        bool _isPowered;
+        uint8_t _port;
+        Servo _servo;
     };
 }
 

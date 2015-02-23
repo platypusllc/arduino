@@ -1,32 +1,6 @@
 #include "MultiPort.h"
 #include "Board.h"
-
-namespace Pin {
-    // This pin enumeration follows the MultiCon connector numbering.
-    enum {
-        V5 = 1,
-        RX_P = 2,
-        RX_N = 3,
-        V12 = 4,
-        TX_P = 5,
-        TX_N = 6,
-        ANA = 7,
-        GND = 8
-    } Mask;
-}
-
-class MultiPortImpl
-: public platypus::MultiPort
-{
-public:
-    void begin(int port);
-    void end();
-
-private:
-    bool _isEnabled;
-    volatile uint8_t _pinUsageMask;
-};
-
+#include <Servo.h>
 
 MultiPortImpl::MultiPortImpl()
 : _pinUsageMask(0)
@@ -42,7 +16,7 @@ MultiPortImpl::~MultiPortImpl()
 float MultiPortImpl::current()
 {
     digitalWrite(board.SEN_SENSE, HIGH);
-    int result = analogRead();
+    int result = analogRead(board.SENSOR[port].CURRENT);
     digitalWrite(board.SEN_SENSE, LOW);
     return (float)result / 3.3;
 }

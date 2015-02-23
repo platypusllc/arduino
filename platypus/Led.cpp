@@ -1,11 +1,6 @@
 #include "Controller.h"
 #include "Board.h"
 
-class LedImpl : public platypus::Led {
-private:
-	int r_, g_, b_;
-};
-
 LedImpl::LedImpl()
   : r_(0), g_(0), b_(0)
 {
