@@ -1,7 +1,7 @@
 Platypus Arduino Library
 ========================
 
-> Warning: This library is still in development.  Please do not use this yet for any active projects.
+> :warning: This library is still in development.  Please do not use this yet for any active projects.
 
 The Platypus Arduino Library provides a standard library for interacting with Platypus Arduino-based hardware, such as the Platypus Controller.
 
