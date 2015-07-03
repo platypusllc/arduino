@@ -2,6 +2,8 @@
 #include "Board.h"
 #include <Servo.h>
 
+using platypus::impl::MultiPort;
+
 MultiPort::MultiPort()
 : _pinUsageMask(0)
 {

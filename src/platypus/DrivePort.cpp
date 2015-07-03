@@ -2,7 +2,9 @@
 #include "Board.h"
 #include <Servo.h>
 
-DrivePortImpl::DrivePortImpl(int port)
+using platypus::impl::DrivePort;
+
+DrivePort::DrivePort(int port)
 : _isPowered(false)
 , _command(0)
 , _servo()
@@ -10,43 +12,43 @@ DrivePortImpl::DrivePortImpl(int port)
     _servo.attach(MOTOR[_port].SERVO);
 }
 
-DrivePortImpl::~DrivePortImpl()
+DrivePort::~DrivePort()
 {
     _servo.detach();
 }
 
-void DrivePortImpl::command(float cmd)
+void DrivePort::command(float cmd)
 {
     _servo.set(_command);
 }
 
-float DrivePortImpl::command() const;
+float DrivePort::command() const;
 {
     return _command;
 }
 
-bool DrivePortImpl::isPowered() const
+bool DrivePort::isPowered() const
 {
     return _isPowered;
 }
 
-void DrivePortImpl::power(bool isPowered)
+void DrivePort::power(bool isPowered)
 {
     digitalWrite(platypus::board::MOTOR[_port], isPowered);
     _isPowered = isPowered;
 }
 
-void DrivePortImpl::powerOn()
+void DrivePort::powerOn()
 {
     this->power(true);
 }
 
-void DrivePortImpl::powerOff()
+void DrivePort::powerOff()
 {
     this->power(false);
 }
         
-float DrivePortImpl::current()
+float DrivePort::current()
 {
     digitalWrite(platypus::board::MOT_SENSE, HIGH);
     int result = analogRead(platypus::board::MOTOR[_port].CURRENT);
@@ -54,7 +56,7 @@ float DrivePortImpl::current()
     return (float)result / 3.3;
 }
 
-void DrivePortImpl::reset()
+void DrivePort::reset()
 {
     this->powerOff();
     this->command(0);
