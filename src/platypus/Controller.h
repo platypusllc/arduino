@@ -9,29 +9,31 @@
 
 namespace platypus
 {
-    class ControllerImpl : public platypus::Controller 
-    {
-    public:
-        ControllerImpl();
 
-        setDrivePort(DrivePort &device);
-        setDrivePorts(DrivePort device[]);
+class ControllerImpl : public platypus::Controller 
+{
+public:
+    ControllerImpl();
 
-        setMultiPort(MultiPort &device);
-        setMultiPorts(MultiPort device[]);
+    setDrivePort(DrivePort &device);
+    setDrivePorts(DrivePort device[]);
 
-        Led& led() const;
-        float battery() const;
-        Stream &command() const;
-        Stream &console() const;
+    setMultiPort(MultiPort &device);
+    setMultiPorts(MultiPort device[]);
 
-    private:
-        ControllerImpl(const Controller &c);
-        virtual ~ControllerImpl();
+    Led& led() const;
+    float battery() const;
+    Stream &command() const;
+    Stream &console() const;
 
-        platypus::DrivePort _drivePorts[NUM_MOTORS];
-        platypus::MultiPort _multiPorts[NUM_SENSORS];
-    };
+private:
+    ControllerImpl(const Controller &c);
+    virtual ~ControllerImpl();
+
+    platypus::DrivePort _drivePorts[NUM_MOTORS];
+    platypus::MultiPort _multiPorts[NUM_SENSORS];
+};
+
 }
 
 #endif // PLATYPUS_CONTROLLER_H

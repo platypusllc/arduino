@@ -6,16 +6,18 @@
 
 #include "platypus.h"
 
-namespace Platypus
+namespace platypus
 {
-    class LedImpl : public platypus::Led
-    {
-      void begin();
-      void end();
 
-    private:
-        int r_, g_, b_;
-    };
+class LedImpl : public platypus::Led
+{
+  void begin();
+  void end();
+
+private:
+    int r_, g_, b_;
+};
+
 }
 
 #endif // PLATYPUS_MULTIPORT_H

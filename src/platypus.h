@@ -14,223 +14,225 @@
 
 namespace platypus
 {
-    /**
-     * Serial::Mode
-     * ============
-     * This is an enumeration of all the serial modes supported by the MultiPort.
-     */ 
-    namespace Serial
-    {
-        enum {
-            RS232, RS485, RS422,
-            NUM_MODES
-        } Mode;
-    }
 
-    /**
-     * Multi::Pin
-     * ============
-     * This is an enumeration of all of the GPIO pins available on the MultiPort.
-     */ 
-    namespace Multi
-    {
-        enum {
-            RX_P, RX_N, TX_P, TX_N, ANA,
-            NUM_PINS
-        } Pin
-    }
+/**
+ * Serial::Mode
+ * ============
+ * This is an enumeration of all the serial modes supported by the MultiPort.
+ */ 
+namespace Serial
+{
+    enum {
+        RS232, RS485, RS422,
+        NUM_MODES
+    } Mode;
+}
 
-    /**
-     * Configurable
-     * ============
-     * The configurable interface is defined for objects that can receive
-     * parameters from JSON key-value tuples.  These tuples are pairs of
-     * strings that can be passed through the console or from a server.
-     */
-    class Configurable
-    {
-    public:     
-        virtual bool set(String param, String value);
-    };
+/**
+ * Multi::Pin
+ * ============
+ * This is an enumeration of all of the GPIO pins available on the MultiPort.
+ */ 
+namespace Multi
+{
+    enum {
+        RX_P, RX_N, TX_P, TX_N, ANA,
+        NUM_PINS
+    } Pin
+}
 
-    /**
-     * LED
-     * ===
-     * This is the interface for a tri-color LED, which can be configured to
-     * display a range of colors.  This LED can be set directly, or configured
-     * through Configurable key-value pairs.
-     */
-    class Led 
-    { 
-    public:
-        virtual void rgb(int red, int green, int blue);
-        virtual void R(int red);
-        virtual int R();
-        virtual void G(int green);
-        virtual int G();
-        virtual void B(int blue);
-        virtual int B();
+/**
+ * Configurable
+ * ============
+ * The configurable interface is defined for objects that can receive
+ * parameters from JSON key-value tuples.  These tuples are pairs of
+ * strings that can be passed through the console or from a server.
+ */
+class Configurable
+{
+public:     
+    virtual bool set(String param, String value);
+};
 
-    protected:
-        Led() {}
-        virtual ~Led() = 0;
+/**
+ * LED
+ * ===
+ * This is the interface for a tri-color LED, which can be configured to
+ * display a range of colors.  This LED can be set directly, or configured
+ * through Configurable key-value pairs.
+ */
+class Led 
+{ 
+public:
+    virtual void rgb(int red, int green, int blue);
+    virtual void R(int red);
+    virtual int R();
+    virtual void G(int green);
+    virtual int G();
+    virtual void B(int blue);
+    virtual int B();
 
-    private:
-        Led(const &Led);
-        Led& operator=(const Led&);
-    };
+protected:
+    Led() {}
+    virtual ~Led() = 0;
 
-    /**
-     * DrivePort
-     * =========
-     * This class represents the functionality of one of the driveports on a
-     * Platypus Controller.  The driveport can be used to command a servo or
-     * a motor controller such as an ESC.
-     */
-    class DrivePort
-    { 
-    public:
-        virtual void command(float cmd);
-        virtual float command() const;
-        
-        virtual bool isPowered() const;
-        virtual void power(bool isPowered);
-        virtual void powerOn();
-        virtual void powerOff();
-        
-        virtual float current();
+private:
+    Led(const &Led);
+    Led& operator=(const Led&);
+};
 
-        virtual void reset();
+/**
+ * DrivePort
+ * =========
+ * This class represents the functionality of one of the driveports on a
+ * Platypus Controller.  The driveport can be used to command a servo or
+ * a motor controller such as an ESC.
+ */
+class DrivePort
+{ 
+public:
+    virtual void command(float cmd);
+    virtual float command() const;
+    
+    virtual bool isPowered() const;
+    virtual void power(bool isPowered);
+    virtual void powerOn();
+    virtual void powerOff();
+    
+    virtual float current();
 
-    protected:
-        DrivePort() {}
-        virtual ~DrivePort() = 0;
+    virtual void reset();
 
-    private:
-        DrivePort(const &DrivePort);
-        DrivePort& operator=(const DrivePort&);
-    };
+protected:
+    DrivePort() {}
+    virtual ~DrivePort() = 0;
 
-    /**
-     * MultiPort
-     * =========
-     * This class represents the functionality of one of the multiports on a
-     * Platypus Controller.  The multiport can be configured for serial, digital,
-     * or analog I/O operation, or certain combinations of the above.  It also
-     * includes two mechanisms for powering electronics, an always-on, current-
-     * limited +5V, and a switchable +VBat.
-     */
+private:
+    DrivePort(const &DrivePort);
+    DrivePort& operator=(const DrivePort&);
+};
 
-    class MultiPort
-    {
-    public:
-        virtual bool beginSerial(int baud, Serial::Mode mode,
-                                 bool tx_enabled=false, bool rx_enabled=false);
-        virtual void endSerial();
-        virtual Stream &serial() const;
+/**
+ * MultiPort
+ * =========
+ * This class represents the functionality of one of the multiports on a
+ * Platypus Controller.  The multiport can be configured for serial, digital,
+ * or analog I/O operation, or certain combinations of the above.  It also
+ * includes two mechanisms for powering electronics, an always-on, current-
+ * limited +5V, and a switchable +VBat.
+ */
 
-        virtual bool beginAnalog(float scale=1.0, float offset=0.0,
-                                 float min_val=-INF, float max_val=INF);
-        virtual void endAnalog();
-        virtual float analog() const;
+class MultiPort
+{
+public:
+    virtual bool beginSerial(int baud, Serial::Mode mode,
+                             bool tx_enabled=false, bool rx_enabled=false);
+    virtual void endSerial();
+    virtual Stream &serial() const;
 
-        virtual bool beginDigital(Multi::Pin pin, bool is_output, int initial_value);
-        virtual void endDigital(Multi::Pin pin);
-        virtual bool read(Multi::Pin pin) const;
-        virtual void write(Multi::Pin pin, bool value);
+    virtual bool beginAnalog(float scale=1.0, float offset=0.0,
+                             float min_val=-INF, float max_val=INF);
+    virtual void endAnalog();
+    virtual float analog() const;
 
-        virtual bool isPowered() const;
-        virtual void power(bool isPowered);
-        virtual void powerOn();
-        virtual void powerOff();
+    virtual bool beginDigital(Multi::Pin pin, bool is_output, int initial_value);
+    virtual void endDigital(Multi::Pin pin);
+    virtual bool read(Multi::Pin pin) const;
+    virtual void write(Multi::Pin pin, bool value);
 
-        virtual float current() const;
+    virtual bool isPowered() const;
+    virtual void power(bool isPowered);
+    virtual void powerOn();
+    virtual void powerOff();
 
-        virtual void reset();
+    virtual float current() const;
 
-    protected:
-        MultiPort() {}
-        virtual ~MultiPort() = 0;
+    virtual void reset();
 
-    private:
-        MultiPort(const &MultiPort);
-        MultiPort& operator=(const MultiPort&);
-    };
+protected:
+    MultiPort() {}
+    virtual ~MultiPort() = 0;
 
-    /**
-     * DriveModule
-     * ===========
-     * Modules represent device-specific control code that can be attached to a
-     * DrivePort or a MultiPort.  This is where the majority of device logic is
-     * normally contained.
-     */
-    class DriveModule : public Configurable
-    { 
-    public:
-        virtual void begin(DrivePort &port);
-        virtual void end();
-        virtual void loop();
-        virtual void arm();
-        virtual void disarm();
-        virtual String name() const = 0;
+private:
+    MultiPort(const &MultiPort);
+    MultiPort& operator=(const MultiPort&);
+};
 
-    protected:
-        virtual ~DriveModule() = 0;
-    };
+/**
+ * DriveModule
+ * ===========
+ * Modules represent device-specific control code that can be attached to a
+ * DrivePort or a MultiPort.  This is where the majority of device logic is
+ * normally contained.
+ */
+class DriveModule : public Configurable
+{ 
+public:
+    virtual void begin(DrivePort &port);
+    virtual void end();
+    virtual void loop();
+    virtual void arm();
+    virtual void disarm();
+    virtual String name() const = 0;
 
-    /**
-     * MultiModule
-     * ===========
-     * Modules represent device-specific control code that can be attached to a
-     * DrivePort or a MultiPort.  This is where the majority of device logic is
-     * normally contained.
-     */
-    class MultiModule : public Configurable
-    { 
-    public:
-        virtual void begin(MultiPort &port);
-        virtual void end();
-        virtual void loop();
-        virtual String name() const = 0;
+protected:
+    virtual ~DriveModule() = 0;
+};
 
-    protected:
-        virtual ~MultiModule() = 0;
-    };
+/**
+ * MultiModule
+ * ===========
+ * Modules represent device-specific control code that can be attached to a
+ * DrivePort or a MultiPort.  This is where the majority of device logic is
+ * normally contained.
+ */
+class MultiModule : public Configurable
+{ 
+public:
+    virtual void begin(MultiPort &port);
+    virtual void end();
+    virtual void loop();
+    virtual String name() const = 0;
 
-    /**
-     * Controller
-     * ==========
-     * This class represents the hardware abstraction for a Platypus Controller.
-     * The controller provides an interface from the Android server to hardware
-     * devices such as motors and sensors.
-     */
-    class Controller : public Configurable
-    {
-    public:
-        virtual void begin();
-        virtual void end();
+protected:
+    virtual ~MultiModule() = 0;
+};
 
-        virtual bool setDrive(int which, DriveModule &device);
-        virtual bool setDrives(DriveModule device[]);
-        virtual int numDrives() const;
+/**
+ * Controller
+ * ==========
+ * This class represents the hardware abstraction for a Platypus Controller.
+ * The controller provides an interface from the Android server to hardware
+ * devices such as motors and sensors.
+ */
+class Controller : public Configurable
+{
+public:
+    virtual void begin();
+    virtual void end();
 
-        virtual bool setMulti(int which, MultiModule &device);
-        virtual bool setMultis(MultiModule device[]);
-        virtual int numMultis() const;
+    virtual bool setDrive(int which, DriveModule &device);
+    virtual bool setDrives(DriveModule device[]);
+    virtual int numDrives() const;
 
-        virtual Led& led() const;
-        virtual float battery() const;
-        virtual Stream &command() const;
-        virtual Stream &console() const;
+    virtual bool setMulti(int which, MultiModule &device);
+    virtual bool setMultis(MultiModule device[]);
+    virtual int numMultis() const;
 
-    protected:
-        Controller() {}
-        virtual ~Controller() = 0;
+    virtual Led& led() const;
+    virtual float battery() const;
+    virtual Stream &command() const;
+    virtual Stream &console() const;
 
-    private:
-        Controller(const &Controller);
-        Controller& operator=(const Controller&);
-    };
+protected:
+    Controller() {}
+    virtual ~Controller() = 0;
+
+private:
+    Controller(const &Controller);
+    Controller& operator=(const Controller&);
+};
+
 }
 
 #endif //PLATYPUS_H
