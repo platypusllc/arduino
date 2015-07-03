@@ -93,6 +93,18 @@ USARTClass *MULTI_SERIAL_PORTS[NUM_MULTI_PORTS] = {
   &Serial3,
 };
 
+// ADK USB Host configuration 
+const char ADK_APPLICATION_NAME[] = "Platypus Server"; // the Android app
+const char ADK_ACCESSORY_NAME[] = "Platypus Controller"; // the Arduino app
+const char ADK_COMPANY_NAME[] = "Platypus LLC";
+const char ADK_VERSION_NUMBER[] = "4.0.1"; // TODO: construct this programmatically.
+const char ADK_SERIAL_NUMBER[] = "4";
+const char ADK_URL[] = "http://senseplatypus.com";
+
+// Time betweeen commands before we consider the Android
+// server to be unresponsive.
+const size_t ADK_TIMEOUT_MS = 500;
+
 }
 }
 

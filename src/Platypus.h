@@ -42,6 +42,21 @@ namespace Multi
 }
 
 /**
+ * ServerStatus
+ * ===========
+ * This is an enumeration of all the connectivity states to the Platypus Server.
+ */
+enum class ServerStatus
+{
+  /** There is no ADK USB device currently plugged in. */
+  DISCONNECTED,
+  /** There is an ADK USB device detected, but it is unresponsive. */
+  CONNECTED,
+  /** There is a Platypus Server currently communicating. */
+  RUNNING  
+};
+
+/**
  * Configurable
  * ============
  * The configurable interface is defined for objects that can receive
@@ -217,17 +232,21 @@ public:
     virtual void end();
 
     virtual DrivePort &drive(int which);
+    virtual const DrivePort &drive(int which) const;
     virtual int numDrives() const;
     virtual bool setDriveModule(int which, DriveModule &device);
     virtual bool setDriveModules(DriveModule device[]);
 
     virtual MultiPort &multi(int which);
+    virtual const MultiPort &multi(int which) const;
     virtual int numMultis() const;
     virtual bool setMultiModule(int which, MultiModule &device);
     virtual bool setMultiModules(MultiModule device[]);
 
-    virtual Led& led() const;
+    virtual Led& led();
+    virtual const Led&led() const;
     virtual float battery() const;
+    virtual ServerStatus status() const;
 
     virtual Stream &command() const;
     virtual Stream &console() const;

@@ -1,4 +1,5 @@
 #include "Controller.h"
+#include "Communication.h"
 #include "Board.h"
 #include <Arduino.h>
 
@@ -33,14 +34,39 @@ void multiLoop(void *data)
 }
 
 Controller::Controller()
+: adk_(&usb_,
+       platypus::board::ADK_COMPANY_NAME, platypus::board::ADK_APPLICATION_NAME,
+       platypus::board::ADK_ACCESSORY_NAME, platypus::board::ADK_VERSION_NUMBER,
+       platypus::board::ADK_URL, platypus::board::ADK_SERIAL_NUMBER);
+, serverStatus_(platypus::ServerStatus::DISCONNECTED)
 {
+  // Create update loops for each drive module.
   for (size_t driveIdx = 0; driveIdx < platypus::board::NUM_DRIVE_PORTS; ++driveIdx)
   {
     Scheduler.start(driveLoop, (void *)driveIdx);
   }
   
+  // Create update loops for each multi module.
   for (size_t multiIdx = 0; multiIdx < platypus::board::NUM_DRIVE_PORTS; ++multiIdx)
   {
     Scheduler.start(multiLoop, (void *)driveIdx);
   }
+
+  // Ensure the ADK buffers will be null terminated strings.
+  command_buffer[INPUT_BUFFER_SIZE] = '\0';
+  console_buffer[INPUT_BUFFER_SIZE] = '\0';
+  output_buffer[OUTPUT_BUFFER_SIZE] = '\0';
+}
+
+Controller::begin()
+{
+  // Latch power shutdown line high to keep board from turning off.
+  pinMode(platypus::board::PWR_KILL, OUTPUT);
+  digitalWrite(platypus::board::PWR_KILL, HIGH);
+
+  // Initialize debugging serial console.
+  Serial.begin(115200);
+
+  // Print startup header to the console.
+  send_header(this->console());
 }
