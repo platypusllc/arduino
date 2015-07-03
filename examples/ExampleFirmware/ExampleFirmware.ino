@@ -6,7 +6,7 @@
 #include <Platypus.h>
 
 // Create an instance of the Platypus Controller.
-platypus::Controller controller;
+platypus::Controller controller = platypus::getController();
 
 // Set up the devices that we want to use on the DrivePort.
 // For this example, we configure two servos.
