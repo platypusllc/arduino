@@ -73,12 +73,11 @@ public:
     virtual int B();
 
 protected:
-    Led() {}
+    Led() = default;
     virtual ~Led() = 0;
 
-private:
-    Led(const &Led);
-    Led& operator=(const Led&);
+    Led(const Led&) = delete;
+    void operator=(const Led&) = delete;
 };
 
 /**
@@ -104,12 +103,11 @@ public:
     virtual void reset();
 
 protected:
-    DrivePort() {}
+    DrivePort() = default;
     virtual ~DrivePort() = 0;
 
-private:
-    DrivePort(const &DrivePort);
-    DrivePort& operator=(const DrivePort&);
+    DrivePort(const &DrivePort) = delete;
+    void operator=(const DrivePort&) = delete;
 };
 
 /**
@@ -150,12 +148,11 @@ public:
     virtual void reset();
 
 protected:
-    MultiPort() {}
+    MultiPort() = default;
     virtual ~MultiPort() = 0;
 
-private:
-    MultiPort(const &MultiPort);
-    MultiPort& operator=(const MultiPort&);
+    MultiPort(const &MultiPort) = delete;
+    void operator=(const MultiPort&) = delete;
 };
 
 /**
@@ -176,7 +173,11 @@ public:
     virtual String name() const = 0;
 
 protected:
+    DriveModule() = default;
     virtual ~DriveModule() = 0;
+
+    DriveModule(const &DriveModule) = delete;
+    void operator=(const DriveModule&) = delete;
 };
 
 /**
@@ -195,7 +196,11 @@ public:
     virtual String name() const = 0;
 
 protected:
+    MultiModule() = default;
     virtual ~MultiModule() = 0;
+
+    MultiModule(const &MultiModule) = delete;
+    void operator=(const MultiModule&) = delete;
 };
 
 /**
@@ -225,12 +230,11 @@ public:
     virtual Stream &console() const;
 
 protected:
-    Controller() {}
+    Controller() = default;
     virtual ~Controller() = 0;
 
-private:
-    Controller(const &Controller);
-    Controller& operator=(const Controller&);
+    Controller(const &Controller) = delete;
+    void operator=(const Controller&) = delete;
 };
 
 }
