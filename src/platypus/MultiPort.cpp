@@ -2,18 +2,18 @@
 #include "Board.h"
 #include <Servo.h>
 
-MultiPortImpl::MultiPortImpl()
+MultiPort::MultiPort()
 : _pinUsageMask(0)
 {
     // TODO: fill this in.
 }
 
-MultiPortImpl::~MultiPortImpl()
+MultiPort::~MultiPort()
 {
     // TODO: fill this in.
 }
 
-float MultiPortImpl::current()
+float MultiPort::current()
 {
     digitalWrite(board.SEN_SENSE, HIGH);
     int result = analogRead(board.SENSOR[port].CURRENT);
@@ -21,7 +21,7 @@ float MultiPortImpl::current()
     return (float)result / 3.3;
 }
 
-MultiPortImpl::reset()
+MultiPort::reset()
 {
 
 }

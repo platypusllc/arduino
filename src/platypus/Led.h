@@ -8,8 +8,10 @@
 
 namespace platypus
 {
+namespace impl
+{
 
-class LedImpl : public platypus::Led
+class Led : public platypus::Led
 {
   void begin();
   void end();
@@ -18,6 +20,7 @@ private:
     int r_, g_, b_;
 };
 
+}
 }
 
 #endif // PLATYPUS_MULTIPORT_H

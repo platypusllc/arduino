@@ -1,7 +1,9 @@
 #include "Controller.h"
 #include "Board.h"
 
-LedImpl::LedImpl()
+using platypus::impl::Led;
+
+Led::Led()
   : r_(0), g_(0), b_(0)
 {
   pinMode(board::LED.R, OUTPUT);
@@ -14,49 +16,49 @@ LedImpl::LedImpl()
   digitalWrite(board::LED.B, HIGH);
 }
 
-LedImpl::~LedImpl()
+Led::~Led()
 {
   pinMode(board::LED.R, INPUT);
   pinMode(board::LED.G, INPUT);
   pinMode(board::LED.B, INPUT);
 }
 
-void LedImpl::set(int red, int green, int blue)
+void Led::set(int red, int green, int blue)
 {
   R(red);
   G(green);
   B(blue);
 }
 
-void LedImpl::R(int red)
+void Led::R(int red)
 {
   r_ = red;
   digitalWrite(board::LED.R, !r_);
 }
 
-int LedImpl::R()
+int Led::R()
 {
   return r_;
 }
 
-void LedImpl::G(int green)
+void Led::G(int green)
 {
   g_ = green;
   digitalWrite(board::LED.G, !g_);
 }
 
-int LedImpl::G()
+int Led::G()
 {
   return g_;
 }
 
-void LedImpl::B(int blue)
+void Led::B(int blue)
 {
   b_ = blue;
   digitalWrite(board::LED.B, !b_);
 }
 
-int LedImpl::B()
+int Led::B()
 {
   return b_;
 }

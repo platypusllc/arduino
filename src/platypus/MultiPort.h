@@ -8,22 +8,24 @@
 
 namespace platypus
 {
+namespace impl
+{
 
 namespace Pin {
-    // This pin enumeration follows the MultiCon connector numbering.
+    // This pin enumeration follows order of the MultiCon pinout.
     enum {
-        V5 = 1,
-        RX_P = 2,
-        RX_N = 3,
-        V12 = 4,
-        TX_P = 5,
-        TX_N = 6,
-        ANA = 7,
-        GND = 8
+        V5   = 0x01,
+        RX_P = 0x02,
+        RX_N = 0x04,
+        V12  = 0x08,
+        TX_P = 0x10,
+        TX_N = 0x20,
+        ANA  = 0x40,
+        GND  = 0x80
     } Mask;
 }
 
-class MultiPortImpl : public platypus::MultiPort
+class MultiPort : public platypus::MultiPort
 {
 public:
     void begin(int port);
@@ -35,6 +37,7 @@ private:
     uint8_t _port;
 };
 
+}
 }
 
 #endif // PLATYPUS_MULTIPORT_H

@@ -8,8 +8,10 @@
 
 namespace platypus
 {
+namespace impl
+{
 
-class DrivePortImpl : public platypus::DrivePort
+class DrivePort : public platypus::DrivePort
 {
 public:
     void begin(int port);
@@ -22,6 +24,7 @@ private:
     Servo _servo;
 };
 
+}
 }
 
 #endif // PLATYPUS_DRIVE_PORT_H

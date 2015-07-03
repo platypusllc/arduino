@@ -4,16 +4,18 @@
 #ifndef PLATYPUS_CONTROLLER_H
 #define PLATYPUS_CONTROLLER_H
 
-#include "platypus.h"
-#include "board.h"
+#include "Platypus.h"
+#include "Board.h"
 
 namespace platypus
 {
+namespace impl
+{
 
-class ControllerImpl : public platypus::Controller 
+class Controller : public platypus::Controller 
 {
 public:
-    ControllerImpl();
+    Controller();
 
     setDrivePort(DrivePort &device);
     setDrivePorts(DrivePort device[]);
@@ -27,13 +29,14 @@ public:
     Stream &console() const;
 
 private:
-    ControllerImpl(const Controller &c);
-    virtual ~ControllerImpl();
+    Controller(const Controller &c) = delete;
+    virtual ~Controller();
 
     platypus::DrivePort _drivePorts[NUM_MOTORS];
     platypus::MultiPort _multiPorts[NUM_SENSORS];
 };
 
+}
 }
 
 #endif // PLATYPUS_CONTROLLER_H
