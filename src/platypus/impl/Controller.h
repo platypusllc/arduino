@@ -13,10 +13,11 @@ namespace platypus
 namespace impl
 {
 
-/** This class actually implements the functionality of the Controller. */
-class ControllerSingleton
+class Controller : public platypus::Controller 
 {
 public:
+    Controller();
+
     setDriveModule(DrivePort &device);
     setDriveModules(DrivePort device[]);
 
@@ -30,11 +31,8 @@ public:
     Stream &console() const;
 
 protected:
-    Controller();
+    Controller(const Controller &c) = delete;
     virtual ~Controller();
-
-    Controller(const &Controller) = delete;
-    void operator=(const Controller&) = delete;
 
     std::array<platypus::DrivePort, platypus::board::NUM_DRIVE_PORTS) drivePorts_;
     std::array<platypus::MultiPort, platypus::board::NUM_MULTI_PORTS) multiPorts_;
