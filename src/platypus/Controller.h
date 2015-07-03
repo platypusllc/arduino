@@ -5,6 +5,7 @@
 #define PLATYPUS_CONTROLLER_H
 
 #include "platypus.h"
+#include "board.h"
 
 namespace platypus
 {
@@ -28,8 +29,8 @@ namespace platypus
         ControllerImpl(const Controller &c);
         virtual ~ControllerImpl();
 
-        platypus::DrivePort _drivePorts[2];
-        platypus::MultiPort _multiPorts[4];
+        platypus::DrivePort _drivePorts[NUM_MOTORS];
+        platypus::MultiPort _multiPorts[NUM_SENSORS];
     };
 }
 
