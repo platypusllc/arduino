@@ -32,9 +32,9 @@ public:
     void end();
 
 private:
-    bool _isEnabled;
-    volatile uint8_t _pinUsageMask;
-    uint8_t _port;
+    bool isPowered_;
+    volatile uint8_t pinUsageMask_;
+    uint8_t port_;
 };
 
 }

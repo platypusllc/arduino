@@ -18,10 +18,10 @@ public:
     void end();
 
 private:
-    float _command;
-    bool _isPowered;
-    uint8_t _port;
-    Servo _servo;
+    float command_;
+    bool isPowered_;
+    uint8_t port_;
+    Servo servo_;
 };
 
 }
