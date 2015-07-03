@@ -7,6 +7,11 @@
 #ifndef PLATYPUS_H
 #define PLATYPUS_H
 
+// Currently, only the Due and similar boards are supported.
+#if !defined(ARDUINO_ARCH_SAM)
+  #error “This library only supports boards with a SAM processor.”
+#endif
+
 namespace platypus
 {
     /**
