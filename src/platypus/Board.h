@@ -17,21 +17,21 @@ struct Version
 };
 
 // Board type definitions
-struct LED
+struct Led
 { 
   int r;
   int g;
   int b;
 };
 
-struct Motor
+struct DrivePort
 { 
   int enable;
   int servo;
   int current;
 };
 
-struct Sensor
+struct MultiPort
 {
   int rx_disable;
   int tx_enable;
@@ -54,21 +54,21 @@ enum GPIO
 // TODO: move this to an external CPP class.
 
 // Board version definition.
-const Version VERSION = {4, 0, 1}
+const Version VERSION = {4, 1, 0}
 
 // Pin definitions.
-const LED LED = { 54, 55, 56 };
+const Led LED = { 54, 55, 56 };
 
-const size_t NUM_MOTORS = 2;
+const size_t NUM_DRIVE_PORTS = 2;
 
-const Motor MOTOR[NUM_MOTORS] = {
+const DrivePort DRIVE_PORTS[NUM_DRIVE_PORTS] = {
   { 50, 11, A8 }, // Motor 0 
   { 48, 12, A9 }  // Motor 1
 };
 
-const size_t NUM_SENSORS = 4;
+const size_t NUM_MULTI_PORTS = 4;
 
-const Sensor SENSOR[NUM_SENSORS] = {
+const MultiPort MULTI_PORTS[NUM_MULTI_PORTS] = {
   { 32, 30, 36, 34, { 21, 2, 20, 3 }, 66,  A8, A7 }, // Sensor 0
   { 33, 31, 37, 35, { 19, 4, 18, 5 }, 67,  A9, A6 }, // Sensor 1
   { 24, 22, 28, 26, { 17, 6, 16, 7 }, 68, A10, A5 }, // Sensor 2
