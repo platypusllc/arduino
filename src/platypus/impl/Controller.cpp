@@ -1,47 +1,10 @@
 #include "Controller.h"
 #include "Board.h"
+#include <Arduino.h>
 
+using platypus::impl::Controller;
 
-// TODO: Switch to using HardwareSerial.
-USARTClass *platypus::SERIAL_PORTS[4] = {
-  NULL,
-  &Serial1,
-  &Serial2,
-  &Serial3,
-};
-
-SerialHandler_t platypus::SERIAL_HANDLERS[4] = {
-  {NULL, NULL},
-  {NULL, NULL},
-  {NULL, NULL},
-  {NULL, NULL}
-};
-
-void serialEvent1() 
-{
-  if (SERIAL_HANDLERS[1].handler != NULL) 
-  {
-    (*SERIAL_HANDLERS[1].handler)(SERIAL_HANDLERS[1].data);
-  }
-}
-
-void serialEvent2() 
-{
-  if (SERIAL_HANDLERS[2].handler != NULL) 
-  {
-    (*SERIAL_HANDLERS[2].handler)(SERIAL_HANDLERS[2].data);
-  }
-}
-
-void serialEvent3() 
-{ 
-  if (SERIAL_HANDLERS[3].handler != NULL) 
-  {
-    (*SERIAL_HANDLERS[3].handler)(SERIAL_HANDLERS[3].data);
-  }
-}
-
-uint32_t platypus::swap(uint32_t bytes)
+uint32_t swap(uint32_t bytes)
 {
   return ((bytes << 24) & 0xFF000000)
          | ((bytes <<  8) & 0x00FF0000)
@@ -49,36 +12,35 @@ uint32_t platypus::swap(uint32_t bytes)
          | ((bytes >> 24) & 0x000000FF);
 }
 
-/**
- * Cooperative task schedulers for Platypus motors and sensors.
- */
-void platypusLoop_()
+void driveLoop(void *data)
 {
-  // TODO: Currently, this runs loops in series, which is wrong.
-  // TODO: Parallelize these cooperative loops.
-  
-  // Run each motor loop task once.
-  for (int motorIdx = 0; motorIdx < board::NUM_MOTORS; ++motorIdx)
+  size_t driveIdx = (size_t)data;
+  Controller &controller = static_cast<Controller>platypus::getController();
+  while (true)
   {
-    Motor *motor = platypus::motors[motorIdx];
-    if (motor != NULL)
-    {
-      platypus::Motor::onLoop_(motor);
-    }
-  }
-
-  // Run each sensor loop task once.  
-  for (int sensorIdx = 0; sensorIdx < board::NUM_SENSORS; ++sensorIdx)
-  {
-    Sensor *sensor = platypus::sensors[sensorIdx];
-    if (sensor != NULL) 
-    {
-      platypus::Sensor::onLoop_(sensor);
-    }
+    controller.driveModules_[driveIdx].loop();
   }
 }
 
-void platypus::init()
+void multiLoop(void *data)
 {
-  Scheduler.startLoop(platypusLoop_);
+  size_t multiIdx = (size_t)data;
+  Controller &controller = static_cast<Controller>platypus::getController();
+  while (true)
+  {
+    controller.multiModules_[multiIdx].loop();
+  }
+}
+
+Controller::Controller()
+{
+  for (size_t driveIdx = 0; driveIdx < platypus::board::NUM_DRIVE_PORTS; ++driveIdx)
+  {
+    Scheduler.start(driveLoop, (void *)driveIdx);
+  }
+  
+  for (size_t multiIdx = 0; multiIdx < platypus::board::NUM_DRIVE_PORTS; ++multiIdx)
+  {
+    Scheduler.start(multiLoop, (void *)driveIdx);
+  }
 }

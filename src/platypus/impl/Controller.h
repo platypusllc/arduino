@@ -23,7 +23,10 @@ protected:
     void operator=(const Controller&) = delete;
 
     std::array<platypus::DrivePort, platypus::board::NUM_DRIVE_PORTS) drivePorts_;
+    std::array<platypus::DriveModule, platypus::board::NUM_DRIVE_PORTS) driveModules_;
+    
     std::array<platypus::MultiPort, platypus::board::NUM_MULTI_PORTS) multiPorts_;
+    std::array<platypus::MultiModule, platypus::board::NUM_MULTI_PORTS) multiModules_;
 };
 
 }

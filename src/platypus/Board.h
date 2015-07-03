@@ -85,6 +85,14 @@ const int LOOPBACK = 40;
 const int PWR_INT = 44;
 const int PWR_KILL = 46;
 
+// TODO: Switch to using HardwareSerial.
+USARTClass *MULTI_SERIAL_PORTS[NUM_MULTI_PORTS] = {
+  NULL,
+  &Serial1,
+  &Serial2,
+  &Serial3,
+};
+
 }
 }
 
