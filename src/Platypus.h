@@ -240,6 +240,11 @@ protected:
     void operator=(const Controller&) = delete;
 };
 
+/** 
+ * Returns a reference to the Platypus Controller.
+ */
+static Controller &getController();
+
 }
 
 #endif //PLATYPUS_H
