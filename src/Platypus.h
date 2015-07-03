@@ -216,16 +216,19 @@ public:
     virtual void begin();
     virtual void end();
 
-    virtual bool setDrive(int which, DriveModule &device);
-    virtual bool setDrives(DriveModule device[]);
+    virtual DrivePort &drive(int which);
     virtual int numDrives() const;
+    virtual bool setDriveModule(int which, DriveModule &device);
+    virtual bool setDriveModules(DriveModule device[]);
 
-    virtual bool setMulti(int which, MultiModule &device);
-    virtual bool setMultis(MultiModule device[]);
+    virtual MultiPort &multi(int which);
     virtual int numMultis() const;
+    virtual bool setMultiModule(int which, MultiModule &device);
+    virtual bool setMultiModules(MultiModule device[]);
 
     virtual Led& led() const;
     virtual float battery() const;
+
     virtual Stream &command() const;
     virtual Stream &console() const;
 

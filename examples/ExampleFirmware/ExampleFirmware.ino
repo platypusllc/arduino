@@ -12,7 +12,7 @@ platypus::Controller controller;
 // For this example, we configure two servos.
 platypus::ServoMotor motor0;
 platypus::ServoMotor motor1;
-platypus::DrivePort motors[2] = { motor0, motor1 }; 
+platypus::DriveModule motors[2] = { motor0, motor1 }; 
 
 // Set up the devices that we want to use on the MultiPorts.
 // For this example, we configure four analog sensors.
@@ -26,7 +26,7 @@ platypus::AnalogSensor sensor0(sampleRate, offset, scale);
 platypus::AnalogSensor sensor1(sampleRate, offset, scale);
 platypus::AnalogSensor sensor2(sampleRate, offset, scale);
 platypus::AnalogSensor sensor3(sampleRate, offset, scale);
-platypus::DrivePort sensors[4] = { sensor0, sensor1, sensor2, sensor3 };
+platypus::MultiModule sensors[4] = { sensor0, sensor1, sensor2, sensor3 };
 
 // Create some references that will hold stream descriptors for JSON commands
 // and the text debugging console.
@@ -39,20 +39,20 @@ void setup()
     controller.begin();
 
     // You can configure drive ports individually:
-    controller.setDrivePort(0, motor0);
-    controller.setDrivePort(1, motor1);
+    controller.setDriveModule(0, motor0);
+    controller.setDriveModule(1, motor1);
     
     // Or you can set them all at once:
-    controller.setDrivePorts(motors);
+    controller.setDriveModules(motors);
 
     // You can configure multi ports individually:
-    controller.setMultiPort(0, sensor0);
-    controller.setMultiPort(1, sensor1);
-    controller.setMultiPort(2, sensor2);
-    controller.setMultiPort(3, sensor3);
+    controller.setMultiModule(0, sensor0);
+    controller.setMultiModule(1, sensor1);
+    controller.setMultiModule(2, sensor2);
+    controller.setMultiModule(3, sensor3);
 
     // Or you can set them all at once:
-    controller.setMultiPorts(sensors);
+    controller.setMultiModules(sensors);
 
     // Get a reference to the JSON command/response stream.
     command = controller.command();
@@ -68,7 +68,7 @@ void loop()
     
     // Blink the LED every second, with the color indicating whether we are
     // connected to Android.
-    controller.led.rgb(0,0,0);
+    controller.led().rgb(0,0,0);
     delay(500);
     if (controller.isConnected()) 
     {
