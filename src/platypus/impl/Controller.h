@@ -15,24 +15,12 @@ namespace impl
 
 class Controller : public platypus::Controller 
 {
-public:
-    Controller();
-
-    setDriveModule(DrivePort &device);
-    setDriveModules(DrivePort device[]);
-
-    setMultiModule(MultiPort &device);
-    setMultiModules(MultiPort device[]);
-
-    Led& led() const;
-    float battery() const;
-
-    Stream &command() const;
-    Stream &console() const;
-
 protected:
-    Controller(const Controller &c) = delete;
+    Controller();
     virtual ~Controller();
+
+    Controller(const &Controller) = delete;
+    void operator=(const Controller&) = delete;
 
     std::array<platypus::DrivePort, platypus::board::NUM_DRIVE_PORTS) drivePorts_;
     std::array<platypus::MultiPort, platypus::board::NUM_MULTI_PORTS) multiPorts_;
