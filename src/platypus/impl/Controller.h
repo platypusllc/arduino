@@ -43,6 +43,11 @@ protected:
 
     // Connectivity to the Android server.
     platypus::ServerStatus serverStatus_;
+
+    // Allow protected access for the communication handlers.
+    friend void handleCommand(Controller &controller, const char *buffer);
+    friend void commandLoop(void *data);
+    friend void consoleLoop(void *data);
 };
 
 }

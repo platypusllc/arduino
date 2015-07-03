@@ -56,6 +56,11 @@ Controller::Controller()
   command_buffer[INPUT_BUFFER_SIZE] = '\0';
   console_buffer[INPUT_BUFFER_SIZE] = '\0';
   output_buffer[OUTPUT_BUFFER_SIZE] = '\0';
+
+  // Create update loops for console and command streams.
+  // TODO: pass a reference here or use the singleton?
+  Scheduler.start(platypus::impl::commandLoop, (void *)this);
+  Scheduler.start(platypus::impl::consoleLoop, (void *)this);
 }
 
 Controller::begin()
