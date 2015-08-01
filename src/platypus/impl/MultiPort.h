@@ -28,13 +28,13 @@ namespace Pin {
 class MultiPort : public platypus::MultiPort
 {
 public:
-    void begin(int port);
+    void begin(uint8_t port);
     void end();
 
 private:
     bool isPowered_;
-    volatile uint8_t pinUsageMask_;
-    uint8_t port_;
+    uint8_t pinUsage_;
+    MultiPort *port_;
 };
 
 }
