@@ -18,6 +18,7 @@ class Led : public platypus::Led
 
 private:
     int r_, g_, b_;
+    bool isActive_;
 };
 
 }

@@ -35,11 +35,11 @@ protected:
 
     // Android send/receive buffers
     const size_t INPUT_BUFFER_SIZE = 512;
-    char command_buffer_[INPUT_BUFFER_SIZE+1];
-    char console_buffer_[INPUT_BUFFER_SIZE+1];
+    char commandBuffer_[INPUT_BUFFER_SIZE+1];
+    char consoleBuffer_[INPUT_BUFFER_SIZE+1];
 
     const size_t OUTPUT_BUFFER_SIZE = 576;
-    char output_buffer_[OUTPUT_BUFFER_SIZE+3];
+    char outputBuffer_[OUTPUT_BUFFER_SIZE+3];
 
     // Connectivity to the Android server.
     platypus::ServerStatus serverStatus_;

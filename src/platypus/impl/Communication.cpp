@@ -3,6 +3,9 @@
 
 using namespace platypus::impl;
 
+// Maximum number of JSON tokens.
+constexpr size_t NUM_JSON_TOKENS = 64;
+
 /** Send status information about this controller. */
 void sendHeader(Stream &stream)
 {
@@ -49,13 +52,13 @@ void send(char *str)
 void reportError(const char *error_message, const char *buffer)
 {
   // Construct a JSON error message.
-  snprintf(output_buffer, OUTPUT_BUFFER_SIZE, 
+  snprintf(outputBuffer, OUTPUT_BUFFER_SIZE,
            "{"
            "\"error\": \"%s\","
            "\"args\": \"%s\""
            "}",
            error_message, buffer);
-  send(output_buffer);
+  send(outputBuffer);
 }
 
 /**
@@ -63,7 +66,7 @@ void reportError(const char *error_message, const char *buffer)
  */
 void reportJsonError(jsmnerr_t error, const char* buffer)
 {
-  char *error_message;
+  char *errorMessage;
   
   // Fill in the appropriate JSON error description.
   switch(error) {
@@ -71,32 +74,32 @@ void reportJsonError(jsmnerr_t error, const char* buffer)
       // If we were successful, there is nothing to report.
       return;
     case JSMN_ERROR_NOMEM:
-      error_message = "Insufficient memory.";
+      errorMessage = "Insufficient memory.";
       break;
     case JSMN_ERROR_INVAL:
-      error_message = "Invalid JSON string.";
+      errorMessage = "Invalid JSON string.";
       break;
     case JSMN_ERROR_PART:
-      error_message = "Incomplete JSON string.";
+      errorMessage = "Incomplete JSON string.";
       break;
     default:
-      error_message = "Unknown JSON error.";
+      errorMessage = "Unknown JSON error.";
       break;
   }
 
   // Send appropriate error message
-  reportError(error_message, buffer);  
+  reportError(errorMessage, buffer);
 }
 
 /**
  * Copies a JSON string token into a provided char* buffer.
  */
 void jsonString(const jsmntok_t &token,
-                const char *json_str, char *output_str, size_t output_len)
+                const char *jsonStr, char *outputStr, size_t outputLen)
 {
-  size_t len = min(token.end - token.start, output_len - 1);
-  strncpy(output_str, &json_str[token.start], len);
-  output_str[len] = '\0';
+  size_t len = min(token.end - token.start, outputLen - 1);
+  strncpy(outputStr, &jsonStr[token.start], len);
+  outputStr[len] = '\0';
 }
 
 /**
@@ -105,31 +108,25 @@ void jsonString(const jsmntok_t &token,
  */
 void handleCommand(Controller &controller, const char *buffer)
 {
-  // JSON parser structure
-  jsmn_parser json_parser;
-  
-  // JSON token buffer
-  const size_t NUM_JSON_TOKENS = 64;
-  jsmntok_t json_tokens[NUM_JSON_TOKENS];
-  
-  // Result of JSON parsing.
-  jsmnerr_t json_result;
+  jsmn_parser jsonParser;
+  jsmnerr_t jsonResult;
+  jsmntok_t jsonTokens[NUM_JSON_TOKENS];
 
   // Initialize the JSON parser.
-  jsmn_init(&json_parser);
+  jsmn_init(&jsonParser);
   
   // Parse command as JSON string
-  json_result = jsmn_parse(&json_parser, buffer, json_tokens, NUM_JSON_TOKENS);
+  jsonResult = jsmn_parse(&jsonParser, buffer, jsonTokens, NUM_JSON_TOKENS);
   
   // Check for valid result, report error on failure.
-  if (json_result != JSMN_SUCCESS)
+  if (jsonResult != JSMN_SUCCESS)
   {
-    reportJsonError(json_result, buffer);
+    reportJsonError(jsonResult, buffer);
     return;
   }
   
   // Get the first token and make sure it is a JSON object.
-  jsmntok_t *token = json_tokens;
+  jsmntok_t *token = jsonTokens;
   if (token->type != JSMN_OBJECT) 
   {
     reportError("Commands must be JSON objects.", buffer);
@@ -155,33 +152,33 @@ void handleCommand(Controller &controller, const char *buffer)
       reportError("Expected name field for entry.", buffer);
       return;
     }
-    json_string(*token, buffer, entry_name, 64);
+    jsonString(*token, buffer, entry_name, 64);
     
     
     // Attempt to decode the configurable object for this entry.
     platypus::Configurable *entry_object;
     
     // If it is a motor, it must take the form 'm1'.
-    if (entry_name[0] == 'm')
+    if (entry_name[0] == 'd')
     {
-      size_t motor_idx = entry_name[1] - '0';
-      if (motor_idx >= board::NUM_MOTORS || entry_name[2] != '\0') 
+      size_t driveIdx = entry_name[1] - '0';
+      if (driveIdx >= platypus::board::NUM_DRIVE_PORTS || entry_name[2] != '\0')
       {
-        reportError("Invalid motor index.", buffer);
+        reportError("Invalid drive module index.", buffer);
         return;
       }
-      entry_object = platypus::motors[motor_idx];
+      entry_object = controller.driveModules_[driveIdx];
     }
     // If it is a motor, it must take the form 's1'.
-    else if (entry_name[0] == 's')
+    else if (entry_name[0] == 'm')
     {
-      size_t sensor_idx = entry_name[1] - '0';
-      if (sensor_idx >= board::NUM_SENSORS || entry_name[2] != '\0') 
+      size_t multiIdx = entry_name[1] - '0';
+      if (multiIdx >= platypus::board::NUM_MULTI_PORTS || entry_name[2] != '\0')
       {
-        reportError("Invalid sensor index.", buffer);
+        reportError("Invalid multi module index.", buffer);
         return;
       }
-      entry_object = platypus::sensors[sensor_idx];
+      entry_object = controller.multiModules_[multiIdx];
     }
     // Report parse error if unable to identify this entry.
     else {
@@ -203,27 +200,26 @@ void handleCommand(Controller &controller, const char *buffer)
     }
     
     // Iterate through each parameter.
-    size_t num_params = token->size / 2;
-    for (size_t param_idx = 0; param_idx < num_params; param_idx++)
+    size_t numParams = token->size / 2;
+    for (size_t paramIdx = 0; paramIdx < numParams; paramIdx++)
     {
       // Get the name field for this parameter.
       token++;
-      char param_name[64];
+      char paramName[64];
       if (token->type != JSMN_STRING)
       {
         reportError("Expected name field for parameter.", buffer);
         return;
       }
-      
-      json_string(*token, buffer, param_name, 64);
+      jsonString(*token, buffer, paramName, 64);
 
       // Get the value field for this parameter.
       token++;
-      char param_value[64];
-      json_string(*token, buffer, param_value, 64);
+      char paramValue[64];
+      jsonString(*token, buffer, paramValue, 64);
 
       // Pass this parameter to the entry object.
-      if (!entry_object->set(param_name, param_value)) {
+      if (!entry_object->set(paramName, paramValue)) {
         reportError("Invalid parameter set.", buffer);
         return;
       }
@@ -237,10 +233,10 @@ void commandLoop(void *data)
   Stream &console = controller.console();
 
   // Keep track of how many reads we haven't made so far.
-  unsigned long last_command_time = 0;
+  unsigned long lastCommandTime = 0;
   
   // Number of bytes received from USB.
-  uint32_t bytes_read = 0;
+  uint32_t bytesRead = 0;
   
   while (true)
   {
@@ -253,7 +249,7 @@ void commandLoop(void *data)
       // If not connected to USB, we are 'DISCONNECTED'.
       if (controller.systemStatus_ != SystemStatus.DISCONNECTED)
       {
-        console.println("STATE: DISCONNECTED");
+        console.println("{\"state\": \"disconnected\"}");
         controller.systemStatus_ = SystemStatus.DISCONNECTED;
       }
       
@@ -266,24 +262,24 @@ void commandLoop(void *data)
       // If connected to USB, we are now 'CONNECTED'!
       if (controller.systemStatus_ == DISCONNECTED)
       {
-        console.println("STATE: CONNECTED");
+        console.println("{\"state\": \"connected\"}");
         controller.systemStatus_ = CONNECTED; 
       }
     }
           
     // Attempt to read command from USB.
-    controller.adk_.read(&bytes_read, INPUT_BUFFER_SIZE,
+    controller.adk_.read(&bytesRead, INPUT_BUFFER_SIZE,
                          (uint8_t*)controller.command_buffer_);
-    unsigned long current_command_time = millis();
-    if (bytes_read <= 0) 
+    unsigned long currentCommandTime = millis();
+    if (bytesRead <= 0)
     {
       // If we haven't received a response in a long time, maybe 
       // we are 'CONNECTED' but the server is not running.
-      if (current_command_time - last_command_time >= RESPONSE_TIMEOUT_MS)
+      if (currentCommandTime - lastCommandTime >= RESPONSE_TIMEOUT_MS)
       {
         if (controller.systemStatus_ == RUNNING)
         {
-          console.println("STATE: CONNECTED");
+          console.println("{\"state\": \"connected\"}");
           controller.systemStatus_ = CONNECTED; 
         }
       }
@@ -297,23 +293,24 @@ void commandLoop(void *data)
       // If we received a command, the server must be 'RUNNING'.
       if (controller.systemStatus_ == CONNECTED) 
       {
-        console.println("STATE: RUNNING");
+        console.println("{\"state\": \"running\"}");
         controller.systemStatus_ = RUNNING; 
       }
       
       // Update the timestamp of last received command.
-      last_command_time = current_command_time;
+      lastCommandTime = currentCommandTime;
     }
     
     // Properly null-terminate the buffer.
-    controller.command_buffer_[bytes_read] = '\0';
+    controller.commandBuffer_[bytesRead] = '\0';
     
     // Copy incoming message to debug console.
-    console.print("<- ");
-    console.println(controller.command_buffer_);
+    console.print("{\"cmd\": \"");
+    console.print(controller.commandBuffer_);
+    console.println("\"}");
       
     // Attempt to parse command
-    handleCommand(controller.command_buffer_);
+    handleCommand(controller.commandBuffer_);
   }
 }
 
@@ -323,30 +320,32 @@ void consoleLoop(void *data)
   Stream &console = controller.console();
 
   // Index to last character in console buffer.
-  size_t console_buffer_idx = 0;
+  size_t consoleBufferIdx = 0;
   
   while (true)
   {
     // Wait until characters are received.
     while (!console.available()) yield();
 
-    // Put the new character into the buffer.  
+    // Put the new character into the buffer.
+    // TODO: read in batches.
     char c = console.read();
-    controller.console_buffer_[console_buffer_idx++] = c;
+    controller.consoleBuffer_[consoleBufferIdx++] = c;
 
     // If it is the end of a line, or we are out of space, parse the buffer.
-    if (console_buffer_idx >= INPUT_BUFFER_SIZE || c == '\n' || c == '\r') 
+    if (consoleBufferIdx >= INPUT_BUFFER_SIZE || c == '\n' || c == '\r')
     {
       // Properly null-terminate the buffer.
-      controller.console_buffer_[console_buffer_idx] = '\0';
-      console_buffer_idx = 0;
+      controller.consoleBuffer_[consoleBufferIdx] = '\0';
+      consoleBufferIdx = 0;
       
       // Echo incoming message on debug console.
-      console.print("## ");
-      console.println(controller.console_buffer_);
+      console.print("{\"cmd\": \"");
+      console.print(controller.consoleBuffer_);
+      console.println("\"}");
       
       // Attempt to parse command.
-      handleCommand(console_buffer); 
+      handleCommand(controller.consoleBuffer);
     }
   }
 }

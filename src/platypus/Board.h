@@ -97,7 +97,7 @@ USARTClass *MULTI_SERIAL_PORTS[NUM_MULTI_PORTS] = {
 const char ADK_APPLICATION_NAME[] = "Platypus Server"; // the Android app
 const char ADK_ACCESSORY_NAME[] = "Platypus Controller"; // the Arduino app
 const char ADK_COMPANY_NAME[] = "Platypus LLC";
-const char ADK_VERSION_NUMBER[] = "4.0.1"; // TODO: construct this programmatically.
+const char ADK_VERSION_NUMBER[] = "4.1.0"; // TODO: construct this programmatically.
 const char ADK_SERIAL_NUMBER[] = "4";
 const char ADK_URL[] = "http://senseplatypus.com";
 

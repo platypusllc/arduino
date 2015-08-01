@@ -40,27 +40,16 @@ Controller::Controller()
        platypus::board::ADK_URL, platypus::board::ADK_SERIAL_NUMBER);
 , serverStatus_(platypus::ServerStatus::DISCONNECTED)
 {
-  // Create update loops for each drive module.
-  for (size_t driveIdx = 0; driveIdx < platypus::board::NUM_DRIVE_PORTS; ++driveIdx)
-  {
-    Scheduler.start(driveLoop, (void *)driveIdx);
-  }
-  
-  // Create update loops for each multi module.
-  for (size_t multiIdx = 0; multiIdx < platypus::board::NUM_DRIVE_PORTS; ++multiIdx)
-  {
-    Scheduler.start(multiLoop, (void *)driveIdx);
-  }
-
   // Ensure the ADK buffers will be null terminated strings.
-  command_buffer[INPUT_BUFFER_SIZE] = '\0';
-  console_buffer[INPUT_BUFFER_SIZE] = '\0';
-  output_buffer[OUTPUT_BUFFER_SIZE] = '\0';
+  commandBuffer[INPUT_BUFFER_SIZE] = '\0';
+  consoleBuffer[INPUT_BUFFER_SIZE] = '\0';
+  outputBuffer[OUTPUT_BUFFER_SIZE] = '\0';
+}
 
-  // Create update loops for console and command streams.
-  // TODO: pass a reference here or use the singleton?
-  Scheduler.start(platypus::impl::commandLoop, (void *)this);
-  Scheduler.start(platypus::impl::consoleLoop, (void *)this);
+Controller::~Controller()
+{
+  // Do nothing.
+  // This should never be reached, Controller is only instantiated as a singleton.
 }
 
 Controller::begin()
@@ -73,5 +62,22 @@ Controller::begin()
   Serial.begin(115200);
 
   // Print startup header to the console.
-  send_header(this->console());
+  sendHeader(this->console());
+
+  // Start update loops for each drive module.
+  for (size_t driveIdx = 0; driveIdx < platypus::board::NUM_DRIVE_PORTS; ++driveIdx)
+  {
+    Scheduler.start(driveLoop, (void *)driveIdx);
+  }
+
+  // Start update loops for each multi module.
+  for (size_t multiIdx = 0; multiIdx < platypus::board::NUM_DRIVE_PORTS; ++multiIdx)
+  {
+    Scheduler.start(multiLoop, (void *)driveIdx);
+  }
+
+  // Create update loops for console and command streams.
+  // TODO: pass a reference here or use the singleton?
+  Scheduler.start(platypus::impl::commandLoop, (void *)this);
+  Scheduler.start(platypus::impl::consoleLoop, (void *)this);
 }
