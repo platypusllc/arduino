@@ -7,20 +7,26 @@ using platypus::impl::MultiPort;
 MultiPort::MultiPort()
 : isPowered_(false),
 , pinUsage_(0)
-, port_(platypus::board::NUM_MULTI_PORTS)
+, port_(nullptr)
 {
     // Do nothing.
 }
 
 MultiPort::~MultiPort()
 {
-    // Do nothing.
+    // Close existing object if necessary.
+    if (port_)
+        end();
 }
 
 void MultiPort::begin(uint8_t port)
 {
+    // Close existing object if necessary.
+    if (port_)
+        end();
+
     // Store the reference to the port.
-    port_ = &platypus::board::MULTI_PORT[port_];
+    port_ = &platypus::board::MULTI_PORTS[port];
 
     // Reset port to initial state.
     reset();
@@ -28,6 +34,10 @@ void MultiPort::begin(uint8_t port)
 
 void MultiPort::end()
 {
+    // Do nothing if the object is not active.
+    if (!port_)
+        return;
+
     // Disable RSxxx receiver
     pinMode(port_->rx_disable, INPUT);
     pinMode(port_->tx_enable, INPUT);
@@ -39,18 +49,31 @@ void MultiPort::end()
 
     // Disable any GPIO pins.
     // TODO: do this disabling.
+
+    // Indicate that this object is no longer active.
+    port_ = nullptr;
 }
 
 float MultiPort::current()
 {
+    // If the port is not active, return an invalid current.
+    if (!port_)
+        return std::NAN;
+
+    // Turn on the current select and read the appropriate line.
     digitalWrite(platypus::board::MULTI_SENSE, HIGH);
     int result = analogRead(port_.current);
     digitalWrite(platypus::board::MULTI_SENSE, LOW);
-    return (float)result / 3.3;
+
+    // Normalize the reading according to the FET spec.
+    return (float)result / 3.3f; // TODO: figure out actual constant to use here.
 }
 
 void MultiPort::reset()
 {
+    if (!port_)
+        return;
+
     // Disable RSxxx receiver
     pinMode(port_->rx_disable, OUTPUT);
     digitalWrite(port_->rx_disable, HIGH);

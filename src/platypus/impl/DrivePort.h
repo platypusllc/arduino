@@ -20,7 +20,7 @@ public:
 private:
     float command_;
     bool isPowered_;
-    uint8_t port_;
+    DrivePort port_;
     Servo servo_;
 };
 
