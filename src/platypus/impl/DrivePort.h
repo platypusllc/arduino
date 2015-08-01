@@ -14,7 +14,7 @@ namespace impl
 class DrivePort : public platypus::DrivePort
 {
 public:
-    void begin(int port);
+    void begin(uint8_t port);
     void end();
 
 private:

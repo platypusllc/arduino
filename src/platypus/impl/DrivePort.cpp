@@ -18,13 +18,13 @@ DrivePort::~DrivePort()
     // Do nothing.
 }
 
-void DrivePort::begin(int port)
+void DrivePort::begin(uint8_t port)
 {
-    // Store the new port that is being used.
+    // Store the index of this port.
     port_ = port;
 
     // Attach servo and set to currently desired command.
-    servo_.attach(DRIVE_PORTS[port_].servo);
+    servo_.attach(platypus::board::DRIVE_PORTS[port_].servo);
     servo_.set(command_);
 
     // Set up motor enable pin and set to current motor status.
@@ -99,9 +99,9 @@ float DrivePort::current()
         return std::NAN;
 
     // Turn on the current select and read the appropriate line.
-    digitalWrite(platypus::board::MOT_SENSE, HIGH);
+    digitalWrite(platypus::board::DRIVE_SENSE, HIGH);
     result = analogRead(platypus::board::DRIVE_PORTS[_port].current);
-    digitalWrite(platypus::board::MOT_SENSE, LOW);
+    digitalWrite(platypus::board::DRIVE_SENSE, LOW);
 
     // Normalize the reading according to the FET spec.
     return (float)result / 3.3f; // TODO: figure out actual constant to use here.
