@@ -7,6 +7,9 @@
 #ifndef PLATYPUS_H
 #define PLATYPUS_H
 
+#include <arduino.h>
+#include <limits>
+
 // Currently, only the Due and similar boards are supported.
 #if !defined(ARDUINO_ARCH_SAM)
   #error “This library only supports boards with a SAM processor.”
@@ -22,10 +25,10 @@ namespace platypus
  */ 
 namespace Serial
 {
-    enum {
+    enum Mode {
         RS232, RS485, RS422,
         NUM_MODES
-    } Mode;
+    };
 }
 
 /**
@@ -35,10 +38,10 @@ namespace Serial
  */ 
 namespace Multi
 {
-    enum {
+    enum Pin {
         RX_P, RX_N, TX_P, TX_N, ANA,
         NUM_PINS
-    } Pin
+    };
 }
 
 /**
@@ -121,7 +124,7 @@ protected:
     DrivePort() = default;
     virtual ~DrivePort() = 0;
 
-    DrivePort(const &DrivePort) = delete;
+    DrivePort(const DrivePort&) = delete;
     void operator=(const DrivePort&) = delete;
 };
 
@@ -144,7 +147,8 @@ public:
     virtual Stream &serial() const;
 
     virtual bool beginAnalog(float scale=1.0, float offset=0.0,
-                             float min_val=-INF, float max_val=INF);
+                             float min_val=-std::numeric_limits<float>::infinity(),
+                             float max_val=std::numeric_limits<float>::infinity());
     virtual void endAnalog();
     virtual float analog() const;
 
@@ -166,7 +170,7 @@ protected:
     MultiPort() = default;
     virtual ~MultiPort() = 0;
 
-    MultiPort(const &MultiPort) = delete;
+    MultiPort(const MultiPort&) = delete;
     void operator=(const MultiPort&) = delete;
 };
 
@@ -191,7 +195,7 @@ protected:
     DriveModule() = default;
     virtual ~DriveModule() = 0;
 
-    DriveModule(const &DriveModule) = delete;
+    DriveModule(const DriveModule&) = delete;
     void operator=(const DriveModule&) = delete;
 };
 
@@ -214,7 +218,7 @@ protected:
     MultiModule() = default;
     virtual ~MultiModule() = 0;
 
-    MultiModule(const &MultiModule) = delete;
+    MultiModule(const MultiModule&) = delete;
     void operator=(const MultiModule&) = delete;
 };
 
@@ -235,13 +239,11 @@ public:
     virtual const DrivePort &drive(int which) const;
     virtual int numDrives() const;
     virtual bool setDriveModule(int which, DriveModule &device);
-    virtual bool setDriveModules(DriveModule device[]);
 
     virtual MultiPort &multi(int which);
     virtual const MultiPort &multi(int which) const;
     virtual int numMultis() const;
     virtual bool setMultiModule(int which, MultiModule &device);
-    virtual bool setMultiModules(MultiModule device[]);
 
     virtual Led& led();
     virtual const Led&led() const;
@@ -255,7 +257,7 @@ protected:
     Controller() = default;
     virtual ~Controller() = 0;
 
-    Controller(const &Controller) = delete;
+    Controller(const Controller&) = delete;
     void operator=(const Controller&) = delete;
 };
 

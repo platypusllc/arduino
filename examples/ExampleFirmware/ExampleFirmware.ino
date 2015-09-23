@@ -26,7 +26,6 @@ platypus::AnalogSensor sensor0(sampleRate, offset, scale);
 platypus::AnalogSensor sensor1(sampleRate, offset, scale);
 platypus::AnalogSensor sensor2(sampleRate, offset, scale);
 platypus::AnalogSensor sensor3(sampleRate, offset, scale);
-platypus::MultiModule sensors[4] = { sensor0, sensor1, sensor2, sensor3 };
 
 // Create some references that will hold stream descriptors for JSON commands
 // and the text debugging console.
@@ -42,17 +41,11 @@ void setup()
     controller.setDriveModule(0, motor0);
     controller.setDriveModule(1, motor1);
     
-    // Or you can set them all at once:
-    controller.setDriveModules(motors);
-
     // You can configure multi ports individually:
     controller.setMultiModule(0, sensor0);
     controller.setMultiModule(1, sensor1);
     controller.setMultiModule(2, sensor2);
     controller.setMultiModule(3, sensor3);
-
-    // Or you can set them all at once:
-    controller.setMultiModules(sensors);
 
     // Get a reference to the JSON command/response stream.
     command = controller.command();
