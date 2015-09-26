@@ -4,6 +4,7 @@
  * Copyright (c) 2014, Platypus LLC. All rights reserved.
  */
 #include <adk.h>  // Inform Arduino IDE that we internally use the Android ADK.
+#include <Servo.h>  // Inform Arduino IDE that we internally use the Servo API.
 #include <Platypus.h>
 
 // Create an instance of the Platypus Controller.
