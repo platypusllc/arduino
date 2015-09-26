@@ -1,5 +1,5 @@
 #include "Communication.h"
-#include "Board.h"
+#include "../Board.h"
 
 using namespace platypus::impl;
 
@@ -12,23 +12,23 @@ void sendHeader(Stream &stream)
   stream.print("{");
   stream.print("\"company_name\": \"");
   stream.print(platypus::board::ADK_COMPANY_NAME);
-  stream.print("\", ")
+  stream.print("\", ");
   stream.print("\"url\": \"");
   stream.print(platypus::board::ADK_URL);
-  stream.print("\", ")
+  stream.print("\", ");
   stream.print("\"accessory_name\": \"");
   stream.print(platypus::board::ADK_ACCESSORY_NAME);
-  stream.print("\", ")
+  stream.print("\", ");
   stream.print("\"version_number\": \"");
   stream.println(platypus::board::ADK_VERSION_NUMBER);
-  stream.print("\"}")
+  stream.print("\"}");
 }
 
 /**
  * Wrapper for ADK send command that copies data to debug port.
  * Requires a null-terminated char* pointer.
  */
-void send(char *str) 
+void send(char *str)
 { 
   // Add newline termination
   // TODO: Make sure we don't buffer overflow
@@ -38,7 +38,8 @@ void send(char *str)
   str[len] = '\0';
   
   // Write string to USB.
-  if (adk.isReady()) adk.write(len, (uint8_t*)str);
+  // TODO: write to USB.
+  //if (adk.isReady()) adk.write(len, (uint8_t*)str);
   
   // Copy string to debugging console.
   Serial.print("-> ");

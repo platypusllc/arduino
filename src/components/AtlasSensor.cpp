@@ -2,23 +2,23 @@
 
 using namespace platypus;
 
-AtlasSensor::AtlasSensor(int channel)
-: Sensor(channel), recv_index_(0)
+void AtlasSensor::begin(MultiPort &port)
 {
   // Start up serial port.
-  SERIAL_PORTS[channel]->begin(38400);
-  
-  // Tell the sensor to output continuously.
-  SERIAL_PORTS[channel_]->print("C\r");
+  Stream *serial = port.beginSerial(38400, SerialMode::RS232);
+
+  // Tell sensor to start transmitting.
+  serial->print("C\r");
 }
 
-char* AtlasSensor::name()
+const String &AtlasSensor::name() const
 {
   return "atlas";
 }
 
-void AtlasSensor::onSerial()
+void AtlasSensor::loop()
 {
+  /*
   char c = SERIAL_PORTS[channel_]->read();
   if (c != '\r' && c != '\n' && recv_index_ < DEFAULT_BUFFER_SIZE)
   {
@@ -33,11 +33,12 @@ void AtlasSensor::onSerial()
     snprintf(output_str, DEFAULT_BUFFER_SIZE,
       "{"
        "\"s%u\":{"
-         "\"type\":\"atlas\","
+         "\"type\":\"%s\","
          "\"data\":\"%s\""
        "}"
       "}",
       channel_,
+      name(),
       recv_buffer_
     );  
     send(output_str);
@@ -45,4 +46,5 @@ void AtlasSensor::onSerial()
     memset(recv_buffer_, 0, recv_index_);   
     recv_index_ = 0;
   }
+  */
 }

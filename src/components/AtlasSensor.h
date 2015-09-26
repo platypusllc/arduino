@@ -1,20 +1,18 @@
 #ifndef PLATYPUS_ATLAS_SENSOR_H
 #define PLATYPUS_ATLAS_SENSOR_H
 
-#include "Platypus.h"
+#include "Components.h"
 
 namespace platypus
 {
-    class AtlasSensor : public Sensor 
+    class AtlasSensor : public MultiModule 
     {
     public:
-        AtlasSensor(int channel);
-        char *name();
-        void onSerial();
-        
-    private:
-        char recv_buffer_[DEFAULT_BUFFER_SIZE];
-        unsigned int recv_index_;
+        AtlasSensor() = default;
+
+        void begin(MultiPort &port) override;
+        void loop() override;
+        const String &name() const override;
     };
 }
 

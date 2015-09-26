@@ -4,23 +4,18 @@ using namespace platypus;
 
 #define WAIT_FOR_CONDITION(condition, timeout_ms) for (unsigned int j = 0; j < (timeout_ms) && !(condition); ++j) delay(1);
 
-AnalogSensor::AnalogSensor(int channel)
-  : Sensor(channel), scale_(1.0f), offset_(0.0f) {}
-
-bool AnalogSensor::set(char* param, char* value)
+bool AnalogSensor::set(const String &param, const String &value)
 {
   // Set analog scale.
-  if (!strncmp("scale", param, 6))
+  if (param == "scale")
   {
-    float s = atof(value);
-    scale(s);
+    scale(value.toFloat());
     return true;
   }
   // Set analog offset.
-  else if (!strncmp("offset", param, 7))
+  else if (param == "offset")
   {
-    float o = atof(value);
-    offset(o);
+    offset(value.toFloat());
     return true;
   }
   // Return false for unknown command.
@@ -50,20 +45,20 @@ float AnalogSensor::offset()
   return offset_;
 }
 
-char* AnalogSensor::name()
+const String &AnalogSensor::name() const
 {
   return "analog";
 }
 
-ServoSensor::ServoSensor(int channel)
-  : Sensor(channel), position_(0.0)
+void ServoSensor::begin(MultiPort &port)
 {
-  servo_.attach(board::SENSOR[channel].GPIO[board::TX_NEG]);
+  int pin = port.beginDigital(MultiPin::TX_N, true, false);
+  servo_.attach(pin);
 }
 
-ServoSensor::~ServoSensor()
+void ServoSensor::end()
 {
-  servo_.detach(); 
+  servo_.detach();
 }
 
 void ServoSensor::position(float position)
@@ -85,13 +80,12 @@ float ServoSensor::position()
   return position_;
 }
 
-bool ServoSensor::set(char *param, char *value)
+bool ServoSensor::set(const String &param, const String &value)
 {
   // Set motor velocity.
-  if (!strncmp("p", param, 2))
+  if (param == "p")
   {
-    float p = atof(value);
-    position(p);
+    position(value.toFloat());
     return true;
   }
   // Return false for unknown command.
@@ -101,19 +95,17 @@ bool ServoSensor::set(char *param, char *value)
   }
 }
 
-char* ServoSensor::name()
+const String &ServoSensor::name() const
 {
   return "servo";
 }
 
-PoweredSensor::PoweredSensor(int channel)
-: Sensor(channel)
+void PoweredSensor::begin(MultiPort &port)
 {
-  pinMode(board::SENSOR[channel_].PWR_ENABLE, OUTPUT);
-  digitalWrite(board::SENSOR[channel_].PWR_ENABLE, HIGH);
+  port.powerOn();
 }
 
-char* PoweredSensor::name()
+const String &PoweredSensor::name() const
 {
   return "powered";
 }

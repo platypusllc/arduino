@@ -4,14 +4,14 @@
 #ifndef PLATYPUS_MULTIPORT_H
 #define PLATYPUS_MULTIPORT_H
 
-#include "platypus.h"
+#include "Platypus.h"
 
 namespace platypus
 {
 namespace impl
 {
 
-class Led : public platypus::Led
+class Led : public ::platypus::Led
 {
   void begin();
   void end();

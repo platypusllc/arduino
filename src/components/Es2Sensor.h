@@ -1,6 +1,8 @@
 #ifndef PLATYPUS_ES2_SENSOR_H
 #define PLATYPUS_ES2_SENSOR_H
 
+#include "Platypus.h"
+
 namespace platypus 
 {
     class Es2Sensor : public Sensor 

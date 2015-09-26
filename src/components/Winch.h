@@ -1,12 +1,12 @@
 #ifndef PLATYPUS_WINCH_H
 #define PLATYPUS_WINCH_H
 
-#include "Platypus.h"
+#include "Components.h"
 #include "RoboClaw.h"
 
 namespace platypus
 {
-    class Winch : public Sensor 
+    class Winch : public MultiModule 
     {
     public:
         Winch(int channel, uint8_t address);

@@ -1,7 +1,7 @@
 #ifndef PLATYPUS_HDF5_SENSOR_H
 #define PLATYPUS_HDF5_SENSOR_H
 
-#include "Platypus.h"
+#include "Components.h"
 
 namespace platypus 
 {

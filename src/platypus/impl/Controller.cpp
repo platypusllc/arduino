@@ -52,6 +52,12 @@ Controller::~Controller()
   // This should never be reached, Controller is only instantiated as a singleton.
 }
 
+Controller &Controller::instance()
+{
+  static Controller instance;
+  return instance;
+}
+
 Controller::begin()
 {
   // Latch power shutdown line high to keep board from turning off.

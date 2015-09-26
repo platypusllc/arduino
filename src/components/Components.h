@@ -2,20 +2,23 @@
 #define PLATYPUS_COMPONENTS_H
 
 #include "Platypus.h"
-#include "RoboClaw.h"
+#include <Servo.h>
 
 namespace platypus 
 {
-  const int DEFAULT_BUFFER_SIZE = 128;
+  constexpr size_t DEFAULT_BUFFER_SIZE = 128;
 
-  class AnalogSensor : public Sensor 
+  class AnalogSensor : public MultiModule 
   {
   public:
-    AnalogSensor(int channel);
+    AnalogSensor() = default;
 
-    bool set(char* param, char* value);
-    char *name();
-    
+    void begin(MultiPort &port) override;
+    void end() override;
+
+    bool set(const String &param, const String &value) override;
+    const String &name() const override;
+
     void scale(float scale);
     float scale();
     
@@ -23,34 +26,41 @@ namespace platypus
     float offset();
     
   private:
-    float scale_;
-    float offset_;
+    float scale_ = 1.0f;
+    float offset_ = 0.0f;
   };
   
-  class ServoSensor : public Sensor 
+  class ServoSensor : public MultiModule 
   {
   public:
-    ServoSensor(int channel);
-    ~ServoSensor();
+    ServoSensor() = default;
 
-    bool set(char* param, char* value);
-    char *name();
+    void begin(MultiPort &port) override;
+    void end() override;
+
+    bool set(const String &param, const String &value) override;
+    const String &name() const override;
     
     void position(float velocity);
     float position();
     
   private:
     Servo servo_;
-    float position_;
+    float position_ = 0.0f;
   };
 
-  class PoweredSensor : public Sensor 
+  class PoweredSensor : public MultiModule 
   {
   public:
-    PoweredSensor(int channel);
-    char *name();
-  };
+    PoweredSensor() = default;
 
+    void begin(MultiPort &port) override;
+    void end() override;
+
+    bool set(const String &param, const String &value) override;
+
+    const String &name() const override;
+  };
 }
 
 #endif // PLATYPUS_COMPONENTS_H

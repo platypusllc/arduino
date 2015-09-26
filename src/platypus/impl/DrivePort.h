@@ -4,14 +4,14 @@
 #ifndef PLATYPUS_DRIVE_PORT_H
 #define PLATYPUS_DRIVE_PORT_H
 
-#include "platypus.h"
+#include "Platypus.h"
 
 namespace platypus
 {
 namespace impl
 {
 
-class DrivePort : public platypus::DrivePort
+class DrivePort : public ::platypus::DrivePort
 {
 public:
     void begin(uint8_t port);

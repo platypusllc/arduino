@@ -1,5 +1,6 @@
+#include "platypus/Board.h"
+#include "platypus/impl/Controller.h"
 #include "Platypus.h"
-#include "impl/ControllerSingleton.h"
 
 using namespace platypus;
 
@@ -7,8 +8,7 @@ using namespace platypus;
  * Creates a single instance of the controller singleton.
  * This instance is used within all instantiated controllers. 
  */
-Controller& getController() 
+Controller& getController()
 {
-  static impl::Controller instance;
-  return instance;
+  return platypus::impl::Controller::instance();
 }

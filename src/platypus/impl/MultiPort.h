@@ -4,7 +4,7 @@
 #ifndef PLATYPUS_MULTIPORT_H
 #define PLATYPUS_MULTIPORT_H
 
-#include "platypus.h"
+#include "Platypus.h"
 
 namespace platypus
 {
@@ -25,7 +25,7 @@ namespace Pin {
     } Mask;
 }
 
-class MultiPort : public platypus::MultiPort
+class MultiPort : public ::platypus::MultiPort
 {
 public:
     void begin(uint8_t port);

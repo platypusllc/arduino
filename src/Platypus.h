@@ -7,12 +7,12 @@
 #ifndef PLATYPUS_H
 #define PLATYPUS_H
 
-#include <arduino.h>
+#include <Arduino.h>
 #include <limits>
 
 // Currently, only the Due and similar boards are supported.
 #if !defined(ARDUINO_ARCH_SAM)
-  #error “This library only supports boards with a SAM processor.”
+    #error “This library only supports boards with a SAM processor.”
 #endif
 
 namespace platypus
@@ -23,33 +23,33 @@ namespace platypus
  * ============
  * This is an enumeration of all the serial modes supported by the MultiPort.
  */ 
-namespace Serial
+enum class SerialMode
 {
-    enum Mode {
-        RS232, RS485, RS422,
-        NUM_MODES
-    };
-}
+    RS232,
+    RS485,
+    RS422
+};
 
 /**
  * Multi::Pin
  * ============
  * This is an enumeration of all of the GPIO pins available on the MultiPort.
  */ 
-namespace Multi
+enum class MultiPin
 {
-    enum Pin {
-        RX_P, RX_N, TX_P, TX_N, ANA,
-        NUM_PINS
-    };
-}
+  RX_P,
+  RX_N,
+  TX_P,
+  TX_N,
+  ANALOG
+};
 
 /**
- * ServerStatus
- * ===========
+ * Status
+ * ======
  * This is an enumeration of all the connectivity states to the Platypus Server.
  */
-enum class ServerStatus
+enum Status
 {
   /** There is no ADK USB device currently plugged in. */
   DISCONNECTED,
@@ -69,7 +69,7 @@ enum class ServerStatus
 class Configurable
 {
 public:     
-    virtual bool set(String param, String value);
+    virtual bool set(const String &param, const String &value);
 };
 
 /**
@@ -82,13 +82,13 @@ public:
 class Led 
 { 
 public:
-    virtual void rgb(int red, int green, int blue);
-    virtual void R(int red);
-    virtual int R();
-    virtual void G(int green);
-    virtual int G();
-    virtual void B(int blue);
-    virtual int B();
+    virtual void rgb(float red, float green, float blue);
+    virtual void R(float red);
+    virtual float R();
+    virtual void G(float green);
+    virtual float G();
+    virtual void B(float blue);
+    virtual float B();
 
 protected:
     Led() = default;
@@ -108,9 +108,18 @@ protected:
 class DrivePort
 { 
 public:
+    /**
+     * Set a servo command between -1.0 (full reverse) and 1.0 (full forward).
+     */
     virtual void command(float cmd);
     virtual float command() const;
     
+    /**
+     * Turns on and off the high-power supply pin of this port.
+     *
+     * This toggles the high-power pin, which can provide up to 25A at the
+     * available battery voltage (+VBatt).
+     */
     virtual bool isPowered() const;
     virtual void power(bool isPowered);
     virtual void powerOn();
@@ -141,29 +150,70 @@ protected:
 class MultiPort
 {
 public:
-    virtual bool beginSerial(int baud, Serial::Mode mode,
-                             bool tx_enabled=false, bool rx_enabled=false);
+    /**
+     * Initialize the serial device for this port using given settings.
+     *
+     * If the pins are already in use or the settings are invalid,
+     * this will return a `nullptr`.  Otherwise, it will return a `Stream`
+     * that can be used to read and write from the port.
+     */
+    virtual Stream *beginSerial(int baud, SerialMode mode,
+                                bool tx_enabled=true, bool rx_enabled=true);
     virtual void endSerial();
     virtual Stream &serial() const;
 
-    virtual bool beginAnalog(float scale=1.0, float offset=0.0,
-                             float min_val=-std::numeric_limits<float>::infinity(),
-                             float max_val=std::numeric_limits<float>::infinity());
+    /**
+     * Initialize the analog pin for this port using the given settings.
+     *
+     * If the pins are already in use or the settings are invalid, this will
+     * return a value of `0`.  Otherwise, it will return the pin ID of the pin
+     * that is being used.  This is not required anywhere, but can be used for
+     * direct Arduino pin IO operations if desired.
+     *
+     * This internally uses the Arduino's analog read and write functions, but
+     * applies a settable scale and offset to the raw reading and makes the
+     * result available through the `analog()` call.
+     *
+     * The scale=1.0, offset=0.0 settings will return the pin voltage in volts.
+     */
+    virtual int beginAnalog(float scale=1.0, float offset=0.0,
+                            float min_val=-std::numeric_limits<float>::infinity(),
+                            float max_val=std::numeric_limits<float>::infinity());
     virtual void endAnalog();
     virtual float analog() const;
 
-    virtual bool beginDigital(Multi::Pin pin, bool is_output, int initial_value);
-    virtual void endDigital(Multi::Pin pin);
-    virtual bool read(Multi::Pin pin) const;
-    virtual void write(Multi::Pin pin, bool value);
+    /**
+     * Initialize a digital pin for this port using the given settings.
+     *
+     * If the pins are already in use or the settings are invalid, this will
+     * return a value of `0`.  Otherwise, it will return the pin ID of the pin
+     * that is being used.  This is not required anywhere, but can be used for
+     * direct Arduino pin IO operations if desired.
+     */
+    virtual int beginDigital(MultiPin pin, bool is_output, int initial_value);
+    virtual void endDigital(MultiPin pin);
+    virtual bool read(MultiPin pin) const;
+    virtual void write(MultiPin pin, bool value);
 
-    virtual bool isPowered() const;
+    /**
+     * Turns on and off the high-power supply pin of this port.
+     *
+     * This toggles the high-power pin, which can provide up to 4A at the
+     * available battery voltage (+VBatt).
+     */
     virtual void power(bool isPowered);
+    virtual bool isPowered() const;
     virtual void powerOn();
     virtual void powerOff();
 
+    /**
+     * Returns the current draw (in amps) on the high-power pin of this port.
+     */
     virtual float current() const;
 
+    /**
+     * Disables all IO and puts the port into its default "safe" settings.
+     */
     virtual void reset();
 
 protected:
@@ -189,7 +239,7 @@ public:
     virtual void loop();
     virtual void arm();
     virtual void disarm();
-    virtual String name() const = 0;
+    virtual const String &name() const = 0;
 
 protected:
     DriveModule() = default;
@@ -212,7 +262,7 @@ public:
     virtual void begin(MultiPort &port);
     virtual void end();
     virtual void loop();
-    virtual String name() const = 0;
+    virtual const String &name() const = 0;
 
 protected:
     MultiModule() = default;
@@ -248,7 +298,8 @@ public:
     virtual Led& led();
     virtual const Led&led() const;
     virtual float battery() const;
-    virtual ServerStatus status() const;
+    virtual Status status() const;
+    virtual bool isConnected() const;
 
     virtual Stream &command() const;
     virtual Stream &console() const;
@@ -264,7 +315,7 @@ protected:
 /** 
  * Returns a reference to the Platypus Controller.
  */
-static Controller &getController();
+Controller &getController();
 
 }
 

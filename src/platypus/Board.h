@@ -55,32 +55,32 @@ enum GPIO
 // TODO: move this to an external CPP class.
 
 // Board version definition.
-const Version VERSION = {4, 1, 0}
+Version const VERSION = {4, 2, 0};
 
 // Pin definitions.
-const Led LED = { 54, 55, 56 };
+Led const LED = { 54, 55, 56 };
 
-const int HALF_DUPLEX01 = 38;
-const int HALF_DUPLEX23 = 39;
+int const HALF_DUPLEX01 = 38;
+int const HALF_DUPLEX23 = 39;
 
-const int V_BATT = A3;
-const int CHG_CTRL = 51;
+int const V_BATT = A3;
+int const CHG_CTRL = 51;
 
-const int LOOPBACK = 40;
+int const LOOPBACK = 40;
 
-const int PWR_INT = 44;
-const int PWR_KILL = 46;
+int const PWR_INT = 44;
+int const PWR_KILL = 46;
 
-const size_t NUM_DRIVE_PORTS = 2;
+size_t const NUM_DRIVE_PORTS = 2;
 
-const DrivePort DRIVE_PORTS[NUM_DRIVE_PORTS] = {
+DrivePort const DRIVE_PORTS[NUM_DRIVE_PORTS] = {
   { 50, 11, A8 }, // Motor 0 
   { 48, 12, A9 }  // Motor 1
 };
 
-const size_t NUM_MULTI_PORTS = 4;
+size_t const NUM_MULTI_PORTS = 4;
 
-const MultiPort MULTI_PORTS[NUM_MULTI_PORTS] = {
+MultiPort const MULTI_PORTS[NUM_MULTI_PORTS] = {
   { 32, 30, 36, 34, { 21, 2, 20, 3 }, 66,  A8, A7, HALF_DUPLEX01 }, // Sensor 0
   { 33, 31, 37, 35, { 19, 4, 18, 5 }, 67,  A9, A6, HALF_DUPLEX01 }, // Sensor 1
   { 24, 22, 28, 26, { 17, 6, 16, 7 }, 68, A10, A5, HALF_DUPLEX23 }, // Sensor 2
@@ -88,7 +88,7 @@ const MultiPort MULTI_PORTS[NUM_MULTI_PORTS] = {
 };
 
 // TODO: Switch to using HardwareSerial.
-USARTClass *MULTI_SERIAL_PORTS[NUM_MULTI_PORTS] = {
+USARTClass * const MULTI_SERIAL_PORTS[NUM_MULTI_PORTS] = {
   NULL,
   &Serial1,
   &Serial2,
@@ -96,16 +96,16 @@ USARTClass *MULTI_SERIAL_PORTS[NUM_MULTI_PORTS] = {
 };
 
 // ADK USB Host configuration 
-const char ADK_APPLICATION_NAME[] = "Platypus Server"; // the Android app
-const char ADK_ACCESSORY_NAME[] = "Platypus Controller"; // the Arduino app
-const char ADK_COMPANY_NAME[] = "Platypus LLC";
-const char ADK_VERSION_NUMBER[] = "4.1.0"; // TODO: construct this programmatically.
-const char ADK_SERIAL_NUMBER[] = "4";
-const char ADK_URL[] = "http://senseplatypus.com";
+char const ADK_APPLICATION_NAME[] = "Platypus Server"; // the Android app
+char const ADK_ACCESSORY_NAME[] = "Platypus Controller"; // the Arduino app
+char const ADK_COMPANY_NAME[] = "Platypus LLC";
+char const ADK_VERSION_NUMBER[] = "4.1.0"; // TODO: construct this programmatically.
+char const ADK_SERIAL_NUMBER[] = "4";
+char const ADK_URL[] = "http://senseplatypus.com";
 
 // Time betweeen commands before we consider the Android
 // server to be unresponsive.
-const size_t ADK_TIMEOUT_MS = 500;
+size_t const ADK_TIMEOUT_MS = 500;
 
 }
 }
