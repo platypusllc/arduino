@@ -30,10 +30,8 @@ int sampleRate = 100; // Sampling rate in Hz
 //platypus::AnalogSensor sensor3(sampleRate, offset, scale);
 //platypus::MultiModule sensors[4] = { sensor0, sensor1, sensor2, sensor3 };
 
-// Create some references that will hold stream descriptors for JSON commands
-// and the text debugging console.
-Stream *command;
-Stream *console;
+// Create a reference to the stream descriptors for JSON commands.
+Stream *stream;
 
 void setup()
 {
@@ -57,10 +55,7 @@ void setup()
     //controller.setMultiModules(sensors);
 
     // Get a reference to the JSON command/response stream.
-    command = &controller.command();
-
-    // Get a reference to the string debugging stream.
-    console = &controller.console();
+    stream = &controller.stream();
 }
 
 void loop()
@@ -84,8 +79,5 @@ void loop()
     
     // Send a JSON status command to Android.
     // All commands must be newline terminated JSON strings.
-    command->print("{\"status\": \"OK\"}\n");
-
-    // Print the same status to the debugging console.
-    console->print("STATUS: OK\n");
+    stream->print("{\"status\": \"OK\"}\n");
 }

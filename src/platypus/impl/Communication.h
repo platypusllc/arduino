@@ -9,8 +9,12 @@ namespace platypus
 namespace impl
 {
 
+class Controller;
+
 void sendHeader(Stream &stream);
-void streamLoop(void *data);
+void handleCommand(Controller &controller, const char *buffer);
+void adkStreamLoop(void *data);
+void serialStreamLoop(void *data);
 
 } // impl
 } // platypus

@@ -1,5 +1,4 @@
 #include "AdkStream.h"
-#include <algorithm>
 
 using namespace platypus::impl;
 
@@ -77,7 +76,7 @@ size_t AdkStream::write(uint8_t val)
 
 size_t AdkStream::write(const uint8_t buf[], size_t len)
 {
-    len = std::min(len, OUTPUT_BUFFER_SIZE - outputIdx_);
-    std::copy(buf, buf+len, outputBuffer_);
+    len = min(len, OUTPUT_BUFFER_SIZE - outputIdx_);
+    memcpy(outputBuffer_, buf, len);
     return len;
 }

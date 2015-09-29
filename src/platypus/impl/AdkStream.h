@@ -9,6 +9,9 @@ namespace platypus
 namespace impl
 {
 
+void adkStreamLoop(void *data);
+void serialStreamLoop(void *data);
+
 class AdkStream : public Stream
 {
 public:

@@ -24,16 +24,17 @@ public:
     // TODO: figure out how to limit this to friend access.
     static Controller &instance();
 
+    // TODO: figure out how to limit this to friend access.
+    std::array<platypus::DriveModule*, platypus::board::NUM_DRIVE_PORTS> driveModules_;
+    std::array<platypus::MultiModule*, platypus::board::NUM_MULTI_PORTS> multiModules_;
+
 private:
     Controller();
     virtual ~Controller();
     
 protected:
     std::array<platypus::DrivePort*, platypus::board::NUM_DRIVE_PORTS> drivePorts_;
-    std::array<platypus::DriveModule*, platypus::board::NUM_DRIVE_PORTS> driveModules_;
-    
     std::array<platypus::MultiPort*, platypus::board::NUM_MULTI_PORTS> multiPorts_;
-    std::array<platypus::MultiModule*, platypus::board::NUM_MULTI_PORTS> multiModules_;
 
     // ADK USB Host
     USBHost usb_;
@@ -44,8 +45,9 @@ protected:
     platypus::Status status_;
 
     // Allow protected access for the communication handlers.
-    friend void handleInput(Controller &controller, char const *buffer);
-    friend void streamLoop(void *data);
+    friend void handleCommand(Controller &controller, const char *buffer);
+    friend void serialStreamLoop(void *data);
+    friend void adkStreamLoop(void *data);
 };
 
 }

@@ -1,9 +1,7 @@
 #include "Communication.h"
-#include "Platypus.h"
+#include "Controller.h"
 #include "platypus/Board.h"
 #include "external/jsmn.h"
-
-#include <algorithm>
 
 // Maximum number of JSON tokens.
 constexpr size_t NUM_JSON_TOKENS = 64;
@@ -86,7 +84,7 @@ void jsonString(const jsmntok_t &token,
  * Handler to respond to incoming JSON commands and dispatch them to
  * configurable hardware components.
  */
-void handleCommand(platypus::Controller &controller, const char *buffer)
+void handleCommand(platypus::impl::Controller &controller, const char *buffer)
 {
   jsmn_parser jsonParser;
   jsmnerr_t jsonResult;
@@ -136,7 +134,7 @@ void handleCommand(platypus::Controller &controller, const char *buffer)
     jsonString(*token, buffer, entry_name, 64);
     
     // Attempt to decode the configurable object for this entry.
-    platypus::Configurable *entry_object;
+    platypus::Configurable *entry_object = nullptr;
     
     // If it is a motor, it must take the form 'm1'.
     if (entry_name[0] == 'd')
@@ -209,9 +207,9 @@ void handleCommand(platypus::Controller &controller, const char *buffer)
   } 
 }
 
-void streamLoop(void *data)
+void adkStreamLoop(void *data)
 {
-  platypus::Controller &controller = static_cast<platypus::Controller*>data;
+  platypus::impl::Controller *controller = static_cast<platypus::impl::Controller*>(data);
 
   // Keep track of how many reads we haven't made so far.
   unsigned long lastCommandTime = 0;
@@ -296,10 +294,10 @@ void streamLoop(void *data)
   }
 }
 
-void consoleLoop(void *data)
+void serialStreamLoop(void *data)
 {
-  Controller &controller = static_cast<Controller*>data;
-  Stream &console = controller.console();
+  platypus::impl::Controller *controller = static_cast<platypus::impl::Controller*>(data);
+  Stream &serial = Serial; // TODO: inherit this from the class.
 
   // Index to last character in console buffer.
   size_t consoleBufferIdx = 0;
@@ -312,7 +310,7 @@ void consoleLoop(void *data)
     // Put the new character into the buffer.
     // TODO: read in batches.
     char c = console.read();
-    controller.consoleBuffer_[consoleBufferIdx++] = c;
+    controller->consoleBuffer_[consoleBufferIdx++] = c;
 
     // If it is the end of a line, or we are out of space, parse the buffer.
     if (consoleBufferIdx >= INPUT_BUFFER_SIZE || c == '\n' || c == '\r')
