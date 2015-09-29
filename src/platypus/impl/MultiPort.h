@@ -34,7 +34,7 @@ public:
 private:
     bool isPowered_;
     uint8_t pinUsage_;
-    MultiPort *port_;
+    const ::platypus::board::MultiConfig *port_;
 };
 
 }

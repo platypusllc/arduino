@@ -27,11 +27,11 @@ void DrivePort::begin(uint8_t port)
         end();
 
     // Store the reference to the port.
-    port_ = &platypus::board::DRIVE_PORTS[port];
+    port_ = &platypus::board::DRIVE_CONFIGS[port];
 
     // Attach servo and set to currently desired command.
     servo_.attach(port_->servo);
-    servo_.set(command_);
+    servo_.writeMicroseconds(command_ * 500 + 1500);
 
     // Set up motor enable pin and set to current motor status.
     pinMode(port_->enable, OUTPUT);
@@ -49,7 +49,7 @@ void DrivePort::end()
         return;
 
     // Detach servo to stop sending commands.
-    _servo.detach();
+    servo_.detach();
 
     // Shut down motor enable pin.
     pinMode(port_->enable, INPUT);
@@ -65,31 +65,31 @@ void DrivePort::end()
 void DrivePort::command(float cmd)
 {
     // Clamp `cmd` to the range -1.0 to 1.0.
-    _command = max(min(cmd, 1.0), -1.0);
+    command_ = max(min(cmd, 1.0), -1.0);
 
     // Only set the command if this port is active.
     if (port_)
-        _servo.set(_command);
+        servo_.writeMicroseconds(command_ * 500 + 1500);
 }
 
 float DrivePort::command() const;
 {
-    return _command;
+    return command_;
 }
 
 bool DrivePort::isPowered() const
 {
-    return _isPowered;
+    return isPowered_;
 }
 
 void DrivePort::power(bool isPowered)
 {
     // Store the new power setting.
-    _isPowered = isPowered;
+    isPowered_ = isPowered;
 
     // Only set the power setting if this port is active.
     if (port_)
-        digitalWrite(platypus::board::DRIVE_PORTS[_port].enable, isPowered);
+        digitalWrite(port_->enable, isPowered);
 }
 
 void DrivePort::powerOn()
@@ -110,7 +110,7 @@ float DrivePort::current()
 
     // Turn on the current select and read the appropriate line.
     digitalWrite(platypus::board::DRIVE_SENSE, HIGH);
-    result = analogRead(platypus::board::DRIVE_PORTS[_port].current);
+    float result = analogRead(port_->current);
     digitalWrite(platypus::board::DRIVE_SENSE, LOW);
 
     // Normalize the reading according to the FET spec.
