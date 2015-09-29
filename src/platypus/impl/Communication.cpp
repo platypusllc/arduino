@@ -1,7 +1,9 @@
 #include "Communication.h"
-#include "../Board.h"
+#include "Platypus.h"
+#include "platypus/Board.h"
+#include "external/jsmn.h"
 
-using namespace platypus::impl;
+#include <algorithm>
 
 // Maximum number of JSON tokens.
 constexpr size_t NUM_JSON_TOKENS = 64;
@@ -9,7 +11,7 @@ constexpr size_t NUM_JSON_TOKENS = 64;
 /** Send status information about this controller. */
 void sendHeader(Stream &stream)
 {
-  stream.print("{");
+  stream.print("{adk: {");
   stream.print("\"company_name\": \"");
   stream.print(platypus::board::ADK_COMPANY_NAME);
   stream.print("\", ");
@@ -21,51 +23,28 @@ void sendHeader(Stream &stream)
   stream.print("\", ");
   stream.print("\"version_number\": \"");
   stream.println(platypus::board::ADK_VERSION_NUMBER);
-  stream.print("\"}");
-}
-
-/**
- * Wrapper for ADK send command that copies data to debug port.
- * Requires a null-terminated char* pointer.
- */
-void send(char *str)
-{ 
-  // Add newline termination
-  // TODO: Make sure we don't buffer overflow
-  size_t len = strlen(str);
-  str[len++] = '\r';
-  str[len++] = '\n';
-  str[len] = '\0';
-  
-  // Write string to USB.
-  // TODO: write to USB.
-  //if (adk.isReady()) adk.write(len, (uint8_t*)str);
-  
-  // Copy string to debugging console.
-  Serial.print("-> ");
-  Serial.print(str);
+  stream.print("\"}}");
 }
 
 /**
  * Returns a JSON error message to the connected USB device and the
  * serial debugging console.
  */
-void reportError(const char *error_message, const char *buffer)
+void reportError(Stream &stream, const char *error_message, const char *buffer)
 {
-  // Construct a JSON error message.
-  snprintf(outputBuffer, OUTPUT_BUFFER_SIZE,
-           "{"
-           "\"error\": \"%s\","
-           "\"args\": \"%s\""
-           "}",
-           error_message, buffer);
-  send(outputBuffer);
+  stream.print("{\"error\":\"");
+  stream.print(error_message);
+  stream.print("\",");
+  stream.print("\"args\":\"");
+  stream.print(buffer);
+  stream.print("\"}");
+  stream.flush();
 }
 
 /**
  * Constructs a JSON error message related to the parsing of a JSON string.
  */
-void reportJsonError(jsmnerr_t error, const char* buffer)
+void reportJsonError(Stream &stream, jsmnerr_t error, const char* buffer)
 {
   char *errorMessage;
   
@@ -89,7 +68,7 @@ void reportJsonError(jsmnerr_t error, const char* buffer)
   }
 
   // Send appropriate error message
-  reportError(errorMessage, buffer);
+  reportError(stream, errorMessage, buffer);
 }
 
 /**
@@ -98,7 +77,7 @@ void reportJsonError(jsmnerr_t error, const char* buffer)
 void jsonString(const jsmntok_t &token,
                 const char *jsonStr, char *outputStr, size_t outputLen)
 {
-  size_t len = min(token.end - token.start, outputLen - 1);
+  size_t len = std::min(size_t(token.end - token.start), outputLen - 1);
   strncpy(outputStr, &jsonStr[token.start], len);
   outputStr[len] = '\0';
 }
@@ -107,22 +86,23 @@ void jsonString(const jsmntok_t &token,
  * Handler to respond to incoming JSON commands and dispatch them to
  * configurable hardware components.
  */
-void handleCommand(Controller &controller, const char *buffer)
+void handleCommand(platypus::Controller &controller, const char *buffer)
 {
   jsmn_parser jsonParser;
   jsmnerr_t jsonResult;
   jsmntok_t jsonTokens[NUM_JSON_TOKENS];
+  Stream &stream = controller.stream();
 
   // Initialize the JSON parser.
   jsmn_init(&jsonParser);
   
-  // Parse command as JSON string
+  // Parse command as JSON string.
   jsonResult = jsmn_parse(&jsonParser, buffer, jsonTokens, NUM_JSON_TOKENS);
   
   // Check for valid result, report error on failure.
   if (jsonResult != JSMN_SUCCESS)
   {
-    reportJsonError(jsonResult, buffer);
+    reportJsonError(stream, jsonResult, buffer);
     return;
   }
   
@@ -130,13 +110,14 @@ void handleCommand(Controller &controller, const char *buffer)
   jsmntok_t *token = jsonTokens;
   if (token->type != JSMN_OBJECT) 
   {
-    reportError("Commands must be JSON objects.", buffer);
+    reportError(stream, "Commands must be JSON objects.", buffer);
     return;
   }
   
   // There should always be an even number of key-value pairs
-  if (token->size & 1) {
-    reportError("Command entries must be key-value pairs.", buffer);
+  if (token->size & 1)
+  {
+    reportError(stream, "Command entries must be key-value pairs.", buffer);
     return;      
   }
   
@@ -144,17 +125,15 @@ void handleCommand(Controller &controller, const char *buffer)
   size_t num_entries = token->size / 2;
   for (size_t entry_idx = 0; entry_idx < num_entries; entry_idx++)
   {
-    
     // Get the name field for this entry.
     token++;
     char entry_name[64];
     if (token->type != JSMN_STRING)
     {
-      reportError("Expected name field for entry.", buffer);
+      reportError(stream, "Expected name field for entry.", buffer);
       return;
     }
     jsonString(*token, buffer, entry_name, 64);
-    
     
     // Attempt to decode the configurable object for this entry.
     platypus::Configurable *entry_object;
@@ -165,38 +144,40 @@ void handleCommand(Controller &controller, const char *buffer)
       size_t driveIdx = entry_name[1] - '0';
       if (driveIdx >= platypus::board::NUM_DRIVE_PORTS || entry_name[2] != '\0')
       {
-        reportError("Invalid drive module index.", buffer);
+        reportError(stream, "Invalid drive module index.", buffer);
         return;
       }
       entry_object = controller.driveModules_[driveIdx];
     }
+
     // If it is a motor, it must take the form 's1'.
     else if (entry_name[0] == 'm')
     {
       size_t multiIdx = entry_name[1] - '0';
       if (multiIdx >= platypus::board::NUM_MULTI_PORTS || entry_name[2] != '\0')
       {
-        reportError("Invalid multi module index.", buffer);
+        reportError(stream, "Invalid multi module index.", buffer);
         return;
       }
       entry_object = controller.multiModules_[multiIdx];
     }
+
     // Report parse error if unable to identify this entry.
     else {
-      reportError("Unknown command entry.", buffer);
+      reportError(stream, "Unknown command entry.", buffer);
       return;
     }
     
     // The following token should always be the entry object.
     token++;
     if (token->type != JSMN_OBJECT) {
-      reportError("Command entries must be objects.", buffer);
+      reportError(stream, "Command entries must be objects.", buffer);
       return;      
     }
 
     // There should always be an even number of key-value pairs
     if (token->size & 1) {
-      reportError("Command parameters must be key-value pairs.", buffer);
+      reportError(stream, "Command parameters must be key-value pairs.", buffer);
       return;      
     }
     
@@ -209,7 +190,7 @@ void handleCommand(Controller &controller, const char *buffer)
       char paramName[64];
       if (token->type != JSMN_STRING)
       {
-        reportError("Expected name field for parameter.", buffer);
+        reportError(stream, "Expected name field for parameter.", buffer);
         return;
       }
       jsonString(*token, buffer, paramName, 64);
@@ -221,17 +202,16 @@ void handleCommand(Controller &controller, const char *buffer)
 
       // Pass this parameter to the entry object.
       if (!entry_object->set(paramName, paramValue)) {
-        reportError("Invalid parameter set.", buffer);
+        reportError(stream, "Invalid parameter set.", buffer);
         return;
       }
     }
   } 
 }
 
-void commandLoop(void *data)
+void streamLoop(void *data)
 {
-  Controller &controller = static_cast<Controller*>data;
-  Stream &console = controller.console();
+  platypus::Controller &controller = static_cast<platypus::Controller*>data;
 
   // Keep track of how many reads we haven't made so far.
   unsigned long lastCommandTime = 0;
@@ -250,7 +230,7 @@ void commandLoop(void *data)
       // If not connected to USB, we are 'DISCONNECTED'.
       if (controller.systemStatus_ != SystemStatus.DISCONNECTED)
       {
-        console.println("{\"state\": \"disconnected\"}");
+        send("{\"state\": \"disconnected\"}");
         controller.systemStatus_ = SystemStatus.DISCONNECTED;
       }
       
@@ -263,6 +243,7 @@ void commandLoop(void *data)
       // If connected to USB, we are now 'CONNECTED'!
       if (controller.systemStatus_ == DISCONNECTED)
       {
+        send("{\"state\": \"disconnected\"}");
         console.println("{\"state\": \"connected\"}");
         controller.systemStatus_ = CONNECTED; 
       }

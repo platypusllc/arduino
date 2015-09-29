@@ -301,8 +301,7 @@ public:
     virtual Status status() const;
     virtual bool isConnected() const;
 
-    virtual Stream &command() const;
-    virtual Stream &console() const;
+    virtual Stream &stream() const;
 
 protected:
     Controller() = default;

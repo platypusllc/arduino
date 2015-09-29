@@ -10,11 +10,9 @@ namespace impl
 {
 
 void sendHeader(Stream &stream);
+void streamLoop(void *data);
 
-void commandLoop(void *data);
-void consoleLoop(void *data);
-
-}
-}
+} // impl
+} // platypus
 
 #endif // PLATYPUS_COMMUNICATION_H

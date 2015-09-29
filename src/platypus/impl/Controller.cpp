@@ -16,7 +16,7 @@ uint32_t swap(uint32_t bytes)
 void driveLoop(void *data)
 {
   size_t driveIdx = (size_t)data;
-  Controller &controller = static_cast<Controller>platypus::getController();
+  Controller &controller = platypus::getController();
   while (true)
   {
     controller.driveModules_[driveIdx].loop();
@@ -26,7 +26,7 @@ void driveLoop(void *data)
 void multiLoop(void *data)
 {
   size_t multiIdx = (size_t)data;
-  Controller &controller = static_cast<Controller>platypus::getController();
+  Controller &controller = platypus::getController();
   while (true)
   {
     controller.multiModules_[multiIdx].loop();
@@ -38,12 +38,10 @@ Controller::Controller()
        platypus::board::ADK_COMPANY_NAME, platypus::board::ADK_APPLICATION_NAME,
        platypus::board::ADK_ACCESSORY_NAME, platypus::board::ADK_VERSION_NUMBER,
        platypus::board::ADK_URL, platypus::board::ADK_SERIAL_NUMBER);
+, Stream_(adk_, Serial),
 , serverStatus_(platypus::ServerStatus::DISCONNECTED)
 {
-  // Ensure the ADK buffers will be null terminated strings.
-  commandBuffer[INPUT_BUFFER_SIZE] = '\0';
-  consoleBuffer[INPUT_BUFFER_SIZE] = '\0';
-  outputBuffer[OUTPUT_BUFFER_SIZE] = '\0';
+  // Do nothing.
 }
 
 Controller::~Controller()
@@ -64,11 +62,11 @@ Controller::begin()
   pinMode(platypus::board::PWR_KILL, OUTPUT);
   digitalWrite(platypus::board::PWR_KILL, HIGH);
 
-  // Initialize debugging serial console.
+  // Initialize serial console.
   Serial.begin(115200);
 
-  // Print startup header to the console.
-  sendHeader(this->console());
+  // Print startup header to the command stream.
+  sendHeader(this->command());
 
   // Start update loops for each drive module.
   for (size_t driveIdx = 0; driveIdx < platypus::board::NUM_DRIVE_PORTS; ++driveIdx)
@@ -79,11 +77,9 @@ Controller::begin()
   // Start update loops for each multi module.
   for (size_t multiIdx = 0; multiIdx < platypus::board::NUM_DRIVE_PORTS; ++multiIdx)
   {
-    Scheduler.start(multiLoop, (void *)driveIdx);
+    Scheduler.start(multiLoop, (void *)multiIdx);
   }
 
-  // Create update loops for console and command streams.
-  // TODO: pass a reference here or use the singleton?
+  // Create update loops for command stream.
   Scheduler.start(platypus::impl::commandLoop, (void *)this);
-  Scheduler.start(platypus::impl::consoleLoop, (void *)this);
 }
