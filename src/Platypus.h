@@ -49,7 +49,7 @@ enum class MultiPin
  * ======
  * This is an enumeration of all the connectivity states to the Platypus Server.
  */
-enum Status
+enum class Status
 {
   /** There is no ADK USB device currently plugged in. */
   DISCONNECTED,

@@ -5,14 +5,9 @@ using namespace platypus::impl;
 AdkStream::AdkStream(ADK &adk, Stream &serial)
 : adk_(adk)
 , serial_(serial)
-, serialInputIdx_(0)
 , outputIdx_(0)
 {
     // Ensure the buffers will be null terminated strings.
-    adkInputBuffer_[0] = '\0';
-    adkInputBuffer_[sizeof(adkInputBuffer_) - 1] = '\0';
-    serialInputBuffer_[0] = '\0';
-    serialInputBuffer_[sizeof(serialInputBuffer_) - 1] = '\0';
     outputBuffer_[0] = '\0';
     outputBuffer_[sizeof(outputBuffer_) - 1] = '\0';
 }

@@ -84,7 +84,7 @@ void jsonString(const jsmntok_t &token,
  * Handler to respond to incoming JSON commands and dispatch them to
  * configurable hardware components.
  */
-void handleCommand(platypus::impl::Controller &controller, const char *buffer)
+void platypus::impl::handleCommand(platypus::impl::Controller &controller, const char *buffer)
 {
   jsmn_parser jsonParser;
   jsmnerr_t jsonResult;
@@ -207,9 +207,13 @@ void handleCommand(platypus::impl::Controller &controller, const char *buffer)
   } 
 }
 
-void adkStreamLoop(void *data)
+void platypus::impl::adkStreamLoop(void *data)
 {
   platypus::impl::Controller *controller = static_cast<platypus::impl::Controller*>(data);
+  Stream &stream = controller->stream();
+  char adkInputBuffer[platypus::impl::INPUT_BUFFER_SIZE+1];  
+  adkInputBuffer[0] = '\0';
+  adkInputBuffer[sizeof(adkInputBuffer) - 1] = '\0';    
 
   // Keep track of how many reads we haven't made so far.
   unsigned long lastCommandTime = 0;
@@ -220,16 +224,17 @@ void adkStreamLoop(void *data)
   while (true)
   {
     // Do USB bookkeeping.
-    Usb.Task();
+    controller->usb_.Task();
     
     // Report system as shutdown if not connected to USB.
-    if (!controller.adk_.isReady())
+    if (!controller->adk_.isReady())
     {
       // If not connected to USB, we are 'DISCONNECTED'.
-      if (controller.systemStatus_ != SystemStatus.DISCONNECTED)
+      if (controller->status_ != platypus::Status::DISCONNECTED)
       {
-        send("{\"state\": \"disconnected\"}");
-        controller.systemStatus_ = SystemStatus.DISCONNECTED;
+        stream.print("{\"status\": \"disconnected\"}");
+        stream.flush();
+        controller->status_ = platypus::Status::DISCONNECTED;
       }
       
       // Wait for USB connection again.
@@ -239,28 +244,29 @@ void adkStreamLoop(void *data)
     else 
     {  
       // If connected to USB, we are now 'CONNECTED'!
-      if (controller.systemStatus_ == DISCONNECTED)
+      if (controller->status_ == platypus::Status::DISCONNECTED)
       {
-        send("{\"state\": \"disconnected\"}");
-        console.println("{\"state\": \"connected\"}");
-        controller.systemStatus_ = CONNECTED; 
+        stream.print("{\"status\": \"disconnected\"}");
+        stream.flush();
+        controller->status_ = platypus::Status::CONNECTED; 
       }
     }
           
     // Attempt to read command from USB.
-    controller.adk_.read(&bytesRead, INPUT_BUFFER_SIZE,
-                         (uint8_t*)controller.command_buffer_);
+    controller->adk_.read(&bytesRead, platypus::impl::INPUT_BUFFER_SIZE,
+                          (uint8_t*)adkInputBuffer);
     unsigned long currentCommandTime = millis();
     if (bytesRead <= 0)
     {
       // If we haven't received a response in a long time, maybe 
       // we are 'CONNECTED' but the server is not running.
-      if (currentCommandTime - lastCommandTime >= RESPONSE_TIMEOUT_MS)
+      if (currentCommandTime - lastCommandTime >= platypus::impl::RESPONSE_TIMEOUT_MS)
       {
-        if (controller.systemStatus_ == RUNNING)
+        if (controller->status_ == platypus::Status::RUNNING)
         {
-          console.println("{\"state\": \"connected\"}");
-          controller.systemStatus_ = CONNECTED; 
+          stream.print("{\"status\": \"connected\"}");
+          stream.flush();
+          controller->status_ = platypus::Status::CONNECTED; 
         }
       }
       
@@ -271,10 +277,11 @@ void adkStreamLoop(void *data)
     else 
     {
       // If we received a command, the server must be 'RUNNING'.
-      if (controller.systemStatus_ == CONNECTED) 
+      if (controller->status_ == platypus::Status::CONNECTED) 
       {
-        console.println("{\"state\": \"running\"}");
-        controller.systemStatus_ = RUNNING; 
+        stream.print("{\"state\": \"running\"}");
+        stream.flush();
+        controller->status_ = platypus::Status::RUNNING; 
       }
       
       // Update the timestamp of last received command.
@@ -282,50 +289,42 @@ void adkStreamLoop(void *data)
     }
     
     // Properly null-terminate the buffer.
-    controller.commandBuffer_[bytesRead] = '\0';
+    adkInputBuffer[bytesRead] = '\0';
     
-    // Copy incoming message to debug console.
-    console.print("{\"cmd\": \"");
-    console.print(controller.commandBuffer_);
-    console.println("\"}");
-      
     // Attempt to parse command
-    handleCommand(controller.commandBuffer_);
+    platypus::impl::handleCommand(*controller, adkInputBuffer);
   }
 }
 
-void serialStreamLoop(void *data)
+void platypus::impl::serialStreamLoop(void *data)
 {
   platypus::impl::Controller *controller = static_cast<platypus::impl::Controller*>(data);
   Stream &serial = Serial; // TODO: inherit this from the class.
 
-  // Index to last character in console buffer.
-  size_t consoleBufferIdx = 0;
-  
+  char serialInputBuffer[platypus::impl::INPUT_BUFFER_SIZE+1];
+  serialInputBuffer[0] = '\0';
+  serialInputBuffer[sizeof(serialInputBuffer) - 1] = '\0';
+  size_t serialInputIdx = 0;
+
   while (true)
   {
     // Wait until characters are received.
-    while (!console.available()) yield();
+    while (!serial.available()) yield();
 
     // Put the new character into the buffer.
     // TODO: read in batches.
-    char c = console.read();
-    controller->consoleBuffer_[consoleBufferIdx++] = c;
+    char c = serial.read();
+    serialInputBuffer[serialInputIdx++] = c;
 
     // If it is the end of a line, or we are out of space, parse the buffer.
-    if (consoleBufferIdx >= INPUT_BUFFER_SIZE || c == '\n' || c == '\r')
+    if (serialInputIdx >= INPUT_BUFFER_SIZE || c == '\n' || c == '\r')
     {
       // Properly null-terminate the buffer.
-      controller.consoleBuffer_[consoleBufferIdx] = '\0';
-      consoleBufferIdx = 0;
-      
-      // Echo incoming message on debug console.
-      console.print("{\"cmd\": \"");
-      console.print(controller.consoleBuffer_);
-      console.println("\"}");
-      
+      serialInputBuffer[serialInputIdx] = '\0';
+      serialInputIdx = 0;
+
       // Attempt to parse command.
-      handleCommand(controller.consoleBuffer);
+      platypus::impl::handleCommand(*controller, serialInputBuffer);
     }
   }
 }

@@ -21,6 +21,8 @@ public:
     Controller(Controller const &) = delete;
     void operator=(Controller const &) = delete;
 
+    void begin() override;
+
     // TODO: figure out how to limit this to friend access.
     static Controller &instance();
 

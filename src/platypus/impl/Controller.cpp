@@ -1,7 +1,8 @@
 #include "Controller.h"
 #include "Communication.h"
-#include "Board.h"
+#include "platypus/Board.h"
 #include <Arduino.h>
+#include <Scheduler.h>
 
 using platypus::impl::Controller;
 
@@ -16,20 +17,20 @@ uint32_t swap(uint32_t bytes)
 void driveLoop(void *data)
 {
   size_t driveIdx = (size_t)data;
-  Controller &controller = platypus::getController();
+  Controller &controller = static_cast<Controller&>(platypus::getController());
   while (true)
   {
-    controller.driveModules_[driveIdx].loop();
+    controller.driveModules_[driveIdx]->loop();
   }
 }
 
 void multiLoop(void *data)
 {
   size_t multiIdx = (size_t)data;
-  Controller &controller = platypus::getController();
+  Controller &controller = static_cast<Controller&>(platypus::getController());
   while (true)
   {
-    controller.multiModules_[multiIdx].loop();
+    controller.multiModules_[multiIdx]->loop();
   }
 }
 
@@ -37,9 +38,9 @@ Controller::Controller()
 : adk_(&usb_,
        platypus::board::ADK_COMPANY_NAME, platypus::board::ADK_APPLICATION_NAME,
        platypus::board::ADK_ACCESSORY_NAME, platypus::board::ADK_VERSION_NUMBER,
-       platypus::board::ADK_URL, platypus::board::ADK_SERIAL_NUMBER);
-, Stream_(adk_, Serial),
-, serverStatus_(platypus::ServerStatus::DISCONNECTED)
+       platypus::board::ADK_URL, platypus::board::ADK_SERIAL_NUMBER)
+, stream_(adk_, Serial)
+, status_(platypus::Status::DISCONNECTED)
 {
   // Do nothing.
 }
@@ -56,7 +57,7 @@ Controller &Controller::instance()
   return instance;
 }
 
-Controller::begin()
+void Controller::begin()
 {
   // Latch power shutdown line high to keep board from turning off.
   pinMode(platypus::board::PWR_KILL, OUTPUT);
@@ -66,7 +67,7 @@ Controller::begin()
   Serial.begin(115200);
 
   // Print startup header to the command stream.
-  sendHeader(this->command());
+  sendHeader(stream());
 
   // Start update loops for each drive module.
   for (size_t driveIdx = 0; driveIdx < platypus::board::NUM_DRIVE_PORTS; ++driveIdx)
@@ -81,5 +82,6 @@ Controller::begin()
   }
 
   // Create update loops for command stream.
-  Scheduler.start(platypus::impl::commandLoop, (void *)this);
+  Scheduler.start(platypus::impl::adkStreamLoop, (void *)this);
+  Scheduler.start(platypus::impl::serialStreamLoop, (void *)this);
 }
