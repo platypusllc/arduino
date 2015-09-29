@@ -115,18 +115,35 @@ public:
     virtual float command() const;
     
     /**
-     * Turns on and off the high-power supply pin of this port.
+     * Turns on and off the high-power VBatt supply for this port.
      *
      * This toggles the high-power pin, which can provide up to 25A at the
      * available battery voltage (+VBatt).
      */
-    virtual bool isPowered() const;
-    virtual void power(bool isPowered);
-    virtual void powerOn();
-    virtual void powerOff();
+    virtual void drivePower(bool isPowered);
+    virtual bool isDrivePowered() const;
+    virtual void drivePowerOn();
+    virtual void drivePowerOff();
     
-    virtual float current();
+    /**
+     * Turns on and off the low-power +5V supply for this port.
+     *
+     * This toggles the low-power pin, which can provide up to 2A at a
+     * regulated +5V from the sensor power bus.
+     */
+    virtual void servoPower(bool isPowered);
+    virtual bool isServoPowered() const;
+    virtual void servoPowerOn();
+    virtual void servoPowerOff();
 
+    /**
+     * Returns the current draw (in amps) on the high-power pin of this port.
+     */
+    virtual float current() const;
+
+    /**
+     * Disables all IO and puts the port into its default "safe" settings.
+     */
     virtual void reset();
 
 protected:

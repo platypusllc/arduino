@@ -21,11 +21,15 @@ public:
 
 	void command(float cmd) override;
     float command() const override;
-    bool isPowered() const override;
-    void power(bool isPowered) override;
-    void powerOn() override;
-    void powerOff() override;
-    float current() override;
+    bool isDrivePowered() const override;
+    void drivePower(bool isPowered) override;
+    void drivePowerOn() override;
+    void drivePowerOff() override;
+    bool isServoPowered() const override;
+    void servoPower(bool isPowered) override;
+    void servoPowerOn() override;
+    void servoPowerOff() override;
+    float current() const override;
     void reset() override;
 protected:
 	DrivePort();
