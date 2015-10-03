@@ -1,11 +1,10 @@
 #include "MultiPort.h"
-#include "platypus/Board.h"
 #include <Servo.h>
 
 using platypus::impl::MultiPort;
 
 MultiPort::MultiPort()
-: isPowered_(false),
+: isPowered_(false)
 , pinUsage_(0)
 , port_(nullptr)
 {
@@ -26,7 +25,14 @@ void MultiPort::begin(uint8_t port)
         end();
 
     // Store the reference to the port.
-    port_ = &platypus::board::MULTI_PORTS[port];
+    port_ = &platypus::board::MULTI_CONFIGS[port];
+
+    // Set up current sense line as control line.
+    pinMode(platypus::board::DRIVE_SENSE, OUTPUT);
+    digitalWrite(platypus::board::DRIVE_SENSE, LOW);
+
+    pinMode(platypus::board::MULTI_SENSE, OUTPUT);
+    digitalWrite(platypus::board::MULTI_SENSE, LOW);
 
     // Reset port to initial state.
     reset();
@@ -54,16 +60,18 @@ void MultiPort::end()
     port_ = nullptr;
 }
 
-float MultiPort::current()
+float MultiPort::current() const
 {
     // If the port is not active, return an invalid current.
     if (!port_)
-        return std::NAN;
+        return std::numeric_limits<double>::quiet_NaN();
 
     // Turn on the current select and read the appropriate line.
+    digitalWrite(platypus::board::DRIVE_SENSE, LOW);
     digitalWrite(platypus::board::MULTI_SENSE, HIGH);
-    int result = analogRead(port_.current);
+    int result = analogRead(port_->pwr_current);
     digitalWrite(platypus::board::MULTI_SENSE, LOW);
+    digitalWrite(platypus::board::DRIVE_SENSE, LOW);
 
     // Normalize the reading according to the FET spec.
     return (float)result / 3.3f; // TODO: figure out actual constant to use here.

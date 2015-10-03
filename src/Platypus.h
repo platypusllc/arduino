@@ -84,11 +84,11 @@ class Led
 public:
     virtual void rgb(float red, float green, float blue);
     virtual void R(float red);
-    virtual float R();
+    virtual float R() const;
     virtual void G(float green);
-    virtual float G();
+    virtual float G() const;
     virtual void B(float blue);
-    virtual float B();
+    virtual float B() const;
 
 protected:
     Led() = default;
@@ -332,6 +332,33 @@ protected:
  * Returns a reference to the Platypus Controller.
  */
 Controller &getController();
+
+/**
+ * To avoid some bugs in various Arduino toolchains, define our own min().
+ */
+template <typename T>
+constexpr T min(T x, T y)
+{
+    return (x < y) ? x : y;
+}
+
+/**
+ * To avoid some bugs in various Arduino toolchains, define our own max().
+ */
+template <typename T>
+constexpr T max(T x, T y)
+{
+    return (x > y) ? x : y;
+}
+
+/**
+ * Clip the input value to between the specified min and max values.
+ */
+template <typename T>
+constexpr T clip(T val, T min_val, T max_val)
+{
+    return min(max(val, min_val), max_val);
+}
 
 }
 

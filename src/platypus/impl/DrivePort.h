@@ -19,7 +19,7 @@ public:
     void begin(uint8_t port);
     void end();
 
-	void command(float cmd) override;
+    void command(float cmd) override;
     float command() const override;
     bool isDrivePowered() const override;
     void drivePower(bool isPowered) override;
@@ -32,19 +32,20 @@ public:
     float current() const override;
     void reset() override;
 protected:
-	DrivePort();
-	virtual ~DrivePort();
+    DrivePort();
+    virtual ~DrivePort();
 
     float command_;
-    bool isPowered_;
+    bool isDrivePowered_;
+    bool isServoPowered_;
     const ::platypus::board::DriveConfig *port_;
     Servo servo_;
 
 private:
-	DrivePort(DrivePort const &) = delete;
-	void operator=(DrivePort const &) = delete;
+    DrivePort(DrivePort const &) = delete;
+    void operator=(DrivePort const &) = delete;
 
-	friend ::platypus::Controller;
+    friend ::platypus::Controller;
 };
 
 }

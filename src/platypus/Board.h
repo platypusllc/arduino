@@ -26,7 +26,8 @@ struct Led
 
 struct DriveConfig
 { 
-  int enable;
+  int drive_enable;
+  int servo_enable;
   int servo;
   int current;
 };
@@ -71,11 +72,14 @@ int const LOOPBACK = 40;
 int const PWR_INT = 44;
 int const PWR_KILL = 46;
 
+int const DRIVE_SENSE = 52;
+int const MULTI_SENSE = 53;
+
 size_t const NUM_DRIVE_PORTS = 2;
 
 DriveConfig const DRIVE_CONFIGS[NUM_DRIVE_PORTS] = {
-  { 50, 11, A8 }, // Motor 0 
-  { 48, 12, A9 }  // Motor 1
+  { 50, 43, 11, A8 }, // Motor 0
+  { 48, 49, 12, A9 }  // Motor 1
 };
 
 size_t const NUM_MULTI_PORTS = 4;

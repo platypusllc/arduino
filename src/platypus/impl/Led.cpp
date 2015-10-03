@@ -1,5 +1,5 @@
-#include "Controller.h"
-#include "Board.h"
+#include "Led.h"
+#include "platypus/Board.h"
 
 using platypus::impl::Led;
 
@@ -18,16 +18,16 @@ Led::~Led()
 void Led::begin()
 {
   // Turn on red LED output and set current value.
-  pinMode(board::LED.R, OUTPUT);
-  digitalWrite(board::LED.R, !r_);
+  pinMode(board::LED.r, OUTPUT);
+  digitalWrite(board::LED.r, !r_);
 
   // Turn on green LED output and set current value.
-  pinMode(board::LED.G, OUTPUT);
-  digitalWrite(board::LED.G, !g_);
+  pinMode(board::LED.g, OUTPUT);
+  digitalWrite(board::LED.g, !g_);
 
   // Turn on blue LED output and set current value.
-  pinMode(board::LED.B, OUTPUT);
-  digitalWrite(board::LED.B, !b_);
+  pinMode(board::LED.b, OUTPUT);
+  digitalWrite(board::LED.b, !b_);
 
   // Indicate that the LED I/O is initialized.
   isActive_ = true;
@@ -36,56 +36,59 @@ void Led::begin()
 void Led::end()
 {
   // Turn off all LED outputs.
-  pinMode(board::LED.R, INPUT);
-  pinMode(board::LED.G, INPUT);
-  pinMode(board::LED.B, INPUT);
+  pinMode(board::LED.r, INPUT);
+  digitalWrite(board::LED.r, LOW);
+  pinMode(board::LED.g, INPUT);
+  digitalWrite(board::LED.g, LOW);
+  pinMode(board::LED.b, INPUT);
+  digitalWrite(board::LED.b, LOW);
 
   // Indicate that the LED I/O is no longer initialized.
   isActive_ = false;
 }
 
-void Led::set(int red, int green, int blue)
+void Led::rgb(float red, float green, float blue)
 {
   R(red);
   G(green);
   B(blue);
 }
 
-void Led::R(int red)
+void Led::R(float red)
 {
-  r_ = red;
+  r_ = platypus::clip(red, 0.0f, 1.0f);
 
   if (isActive_)
-    digitalWrite(board::LED.R, !r_);
+    digitalWrite(board::LED.r, !r_);
 }
 
-int Led::R()
+float Led::R() const
 {
   return r_;
 }
 
-void Led::G(int green)
+void Led::G(float green)
 {
-  g_ = green;
+  g_ = platypus::clip(green, 0.0f, 1.0f);;
 
   if (isActive_)
-    digitalWrite(board::LED.G, !g_);
+    digitalWrite(board::LED.g, !g_);
 }
 
-int Led::G()
+float Led::G() const
 {
   return g_;
 }
 
-void Led::B(int blue)
+void Led::B(float blue)
 {
-  b_ = blue;
+  b_ = platypus::clip(blue, 0.0f, 1.0f);;
 
   if (isActive_)
-    digitalWrite(board::LED.B, !b_);
+    digitalWrite(board::LED.b, !b_);
 }
 
-int Led::B()
+float Led::B() const
 {
   return b_;
 }

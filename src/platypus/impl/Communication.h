@@ -1,8 +1,8 @@
 #ifndef PLATYPUS_COMMUNICATION_H
 #define PLATYPUS_COMMUNICATION_H
 
-#include <Arduino.h>
 #include <adk.h>
+#include <Arduino.h>
 
 namespace platypus
 {
