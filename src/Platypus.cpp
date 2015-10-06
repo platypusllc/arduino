@@ -8,7 +8,14 @@ using namespace platypus;
  * Creates a single instance of the controller singleton.
  * This instance is used within all instantiated controllers. 
  */
-Controller& getController()
+Controller& platypus::getController()
 {
   return platypus::impl::Controller::instance();
 }
+
+Controller::~Controller() {}
+DriveModule::~DriveModule() {}
+DrivePort::~DrivePort() {}
+Led::~Led() {}
+MultiModule::~MultiModule() {}
+MultiPort::~MultiPort() {}

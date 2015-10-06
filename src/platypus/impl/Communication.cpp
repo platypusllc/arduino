@@ -7,7 +7,7 @@
 constexpr size_t NUM_JSON_TOKENS = 64;
 
 /** Send status information about this controller. */
-void sendHeader(Stream &stream)
+void platypus::impl::sendHeader(Stream &stream)
 {
   stream.print("{adk: {");
   stream.print("\"company_name\": \"");

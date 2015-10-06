@@ -11,6 +11,8 @@ namespace platypus
 namespace impl
 {
 
+class Controller;
+
 class Led : public ::platypus::Led
 {
 	void begin();
@@ -35,7 +37,7 @@ private:
 	Led(Led const &) = delete;
 	void operator=(Led const &) = delete;
 
-    friend ::platypus::Controller;
+    friend Controller;
 };
 
 }

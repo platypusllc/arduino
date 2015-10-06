@@ -69,7 +69,7 @@ enum class Status
 class Configurable
 {
 public:     
-    virtual bool set(const String &param, const String &value);
+    virtual bool set(const String &param, const String &value) = 0;
 };
 
 /**
@@ -82,13 +82,13 @@ public:
 class Led 
 { 
 public:
-    virtual void rgb(float red, float green, float blue);
-    virtual void R(float red);
-    virtual float R() const;
-    virtual void G(float green);
-    virtual float G() const;
-    virtual void B(float blue);
-    virtual float B() const;
+    virtual void rgb(float red, float green, float blue) = 0;
+    virtual void R(float red) = 0;
+    virtual float R() const = 0;
+    virtual void G(float green) = 0;
+    virtual float G() const = 0;
+    virtual void B(float blue) = 0;
+    virtual float B() const = 0;
 
 protected:
     Led() = default;
@@ -299,26 +299,27 @@ protected:
 class Controller : public Configurable
 {
 public:
-    virtual void begin();
-    virtual void end();
+    virtual void begin() = 0;
+    virtual void end() = 0;
+    virtual void reset() = 0;
 
-    virtual DrivePort &drive(int which);
-    virtual const DrivePort &drive(int which) const;
-    virtual int numDrives() const;
-    virtual bool setDriveModule(int which, DriveModule &device);
+    virtual DrivePort &drive(unsigned int which) = 0;
+    virtual const DrivePort &drive(unsigned int which) const = 0;
+    virtual unsigned int numDrives() const = 0;
+    virtual bool setDriveModule(unsigned int which, DriveModule &device) = 0;
 
-    virtual MultiPort &multi(int which);
-    virtual const MultiPort &multi(int which) const;
-    virtual int numMultis() const;
-    virtual bool setMultiModule(int which, MultiModule &device);
+    virtual MultiPort &multi(unsigned int which) = 0;
+    virtual const MultiPort &multi(unsigned int which) const = 0;
+    virtual unsigned int numMultis() const = 0;
+    virtual bool setMultiModule(unsigned int which, MultiModule &device) = 0;
 
-    virtual Led& led();
-    virtual const Led&led() const;
-    virtual float battery() const;
-    virtual Status status() const;
-    virtual bool isConnected() const;
+    virtual Led& led() = 0;
+    virtual const Led& led() const = 0;
+    virtual float battery() const = 0;
+    virtual Status status() const = 0;
+    virtual bool isConnected() const = 0;
 
-    virtual Stream &stream() const;
+    virtual Stream &stream() = 0;
 
 protected:
     Controller() = default;
