@@ -111,8 +111,8 @@ public:
     /**
      * Set a servo command between -1.0 (full reverse) and 1.0 (full forward).
      */
-    virtual void command(float cmd);
-    virtual float command() const;
+    virtual void command(float cmd) = 0;
+    virtual float command() const = 0;
     
     /**
      * Turns on and off the high-power VBatt supply for this port.
@@ -120,10 +120,10 @@ public:
      * This toggles the high-power pin, which can provide up to 25A at the
      * available battery voltage (+VBatt).
      */
-    virtual void drivePower(bool isPowered);
-    virtual bool isDrivePowered() const;
-    virtual void drivePowerOn();
-    virtual void drivePowerOff();
+    virtual void drivePower(bool isPowered) = 0;
+    virtual bool isDrivePowered() const = 0;
+    virtual void drivePowerOn() = 0;
+    virtual void drivePowerOff() = 0;
     
     /**
      * Turns on and off the low-power +5V supply for this port.
@@ -131,20 +131,20 @@ public:
      * This toggles the low-power pin, which can provide up to 2A at a
      * regulated +5V from the sensor power bus.
      */
-    virtual void servoPower(bool isPowered);
-    virtual bool isServoPowered() const;
-    virtual void servoPowerOn();
-    virtual void servoPowerOff();
+    virtual void servoPower(bool isPowered) = 0;
+    virtual bool isServoPowered() const = 0;
+    virtual void servoPowerOn() = 0;
+    virtual void servoPowerOff() = 0;
 
     /**
      * Returns the current draw (in amps) on the high-power pin of this port.
      */
-    virtual float current() const;
+    virtual float current() const = 0;
 
     /**
      * Disables all IO and puts the port into its default "safe" settings.
      */
-    virtual void reset();
+    virtual void reset() = 0;
 
 protected:
     DrivePort() = default;
@@ -175,9 +175,9 @@ public:
      * that can be used to read and write from the port.
      */
     virtual Stream *beginSerial(int baud, SerialMode mode,
-                                bool tx_enabled=true, bool rx_enabled=true);
-    virtual void endSerial();
-    virtual Stream &serial() const;
+                                bool tx_enabled=true, bool rx_enabled=true) = 0;
+    virtual void endSerial() = 0;
+    virtual Stream &serial() const = 0;
 
     /**
      * Initialize the analog pin for this port using the given settings.
@@ -195,9 +195,9 @@ public:
      */
     virtual int beginAnalog(float scale=1.0, float offset=0.0,
                             float min_val=-std::numeric_limits<float>::infinity(),
-                            float max_val=std::numeric_limits<float>::infinity());
-    virtual void endAnalog();
-    virtual float analog() const;
+                            float max_val=std::numeric_limits<float>::infinity()) = 0;
+    virtual void endAnalog() = 0;
+    virtual float analog() const = 0;
 
     /**
      * Initialize a digital pin for this port using the given settings.
@@ -207,10 +207,10 @@ public:
      * that is being used.  This is not required anywhere, but can be used for
      * direct Arduino pin IO operations if desired.
      */
-    virtual int beginDigital(MultiPin pin, bool is_output, int initial_value);
-    virtual void endDigital(MultiPin pin);
-    virtual bool read(MultiPin pin) const;
-    virtual void write(MultiPin pin, bool value);
+    virtual int beginDigital(MultiPin pin, bool is_output, int initial_value) = 0;
+    virtual void endDigital(MultiPin pin) = 0;
+    virtual bool read(MultiPin pin) const = 0;
+    virtual void write(MultiPin pin, bool value) = 0;
 
     /**
      * Turns on and off the high-power supply pin of this port.
@@ -218,20 +218,20 @@ public:
      * This toggles the high-power pin, which can provide up to 4A at the
      * available battery voltage (+VBatt).
      */
-    virtual void power(bool isPowered);
-    virtual bool isPowered() const;
-    virtual void powerOn();
-    virtual void powerOff();
+    virtual void power(bool isPowered) = 0;
+    virtual bool isPowered() const = 0;
+    virtual void powerOn() = 0;
+    virtual void powerOff() = 0;
 
     /**
      * Returns the current draw (in amps) on the high-power pin of this port.
      */
-    virtual float current() const;
+    virtual float current() const = 0;
 
     /**
      * Disables all IO and puts the port into its default "safe" settings.
      */
-    virtual void reset();
+    virtual void reset() = 0;
 
 protected:
     MultiPort() = default;
