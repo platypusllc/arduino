@@ -176,7 +176,7 @@ platypus::Status Controller::status() const
 
 bool Controller::isConnected() const
 {
-    return false;
+    return (status() != Status::DISCONNECTED);
 }
 
 Stream &Controller::stream()
