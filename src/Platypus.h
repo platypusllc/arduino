@@ -122,8 +122,8 @@ public:
      */
     virtual void drivePower(bool isPowered) = 0;
     virtual bool isDrivePowered() const = 0;
-    virtual void drivePowerOn() = 0;
-    virtual void drivePowerOff() = 0;
+    virtual void drivePowerOn();
+    virtual void drivePowerOff();
     
     /**
      * Turns on and off the low-power +5V supply for this port.
@@ -133,8 +133,8 @@ public:
      */
     virtual void servoPower(bool isPowered) = 0;
     virtual bool isServoPowered() const = 0;
-    virtual void servoPowerOn() = 0;
-    virtual void servoPowerOff() = 0;
+    virtual void servoPowerOn();
+    virtual void servoPowerOff();
 
     /**
      * Returns the current draw (in amps) on the high-power pin of this port.
@@ -145,6 +145,14 @@ public:
      * Disables all IO and puts the port into its default "safe" settings.
      */
     virtual void reset() = 0;
+
+    /**
+     * Get a reference to a dummy port.
+     *
+     * This port does nothing, and exists as a placeholder for uninitialized
+     * or invalid references.
+     */
+    static DrivePort &dummy();
 
 protected:
     DrivePort() = default;
@@ -177,7 +185,7 @@ public:
     virtual Stream *beginSerial(int baud, SerialMode mode,
                                 bool tx_enabled=true, bool rx_enabled=true) = 0;
     virtual void endSerial() = 0;
-    virtual Stream &serial() const = 0;
+    virtual Stream &serial() = 0;
 
     /**
      * Initialize the analog pin for this port using the given settings.
@@ -220,8 +228,8 @@ public:
      */
     virtual void power(bool isPowered) = 0;
     virtual bool isPowered() const = 0;
-    virtual void powerOn() = 0;
-    virtual void powerOff() = 0;
+    virtual void powerOn();
+    virtual void powerOff();
 
     /**
      * Returns the current draw (in amps) on the high-power pin of this port.
@@ -232,6 +240,14 @@ public:
      * Disables all IO and puts the port into its default "safe" settings.
      */
     virtual void reset() = 0;
+
+    /**
+     * Get a reference to a dummy port.
+     *
+     * This port does nothing, and exists as a placeholder for uninitialized
+     * or invalid references.
+     */
+    static MultiPort &dummy();
 
 protected:
     MultiPort() = default;
@@ -260,7 +276,7 @@ public:
     virtual bool set(const String &param, const String &value);
 
 protected:
-    DrivePort &port_;
+    DrivePort &port_ = DrivePort::dummy();
 
     DriveModule() = default;
     virtual ~DriveModule() = 0;
@@ -285,7 +301,7 @@ public:
     virtual const String &name() const = 0;
 
 protected:
-    MultiPort &port_;
+    MultiPort &port_ = MultiPort::dummy();
 
     MultiModule() = default;
     virtual ~MultiModule() = 0;

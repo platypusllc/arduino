@@ -23,12 +23,8 @@ public:
     float command() const override;
     bool isDrivePowered() const override;
     void drivePower(bool isPowered) override;
-    void drivePowerOn() override;
-    void drivePowerOff() override;
     bool isServoPowered() const override;
     void servoPower(bool isPowered) override;
-    void servoPowerOn() override;
-    void servoPowerOff() override;
     float current() const override;
     void reset() override;
 protected:

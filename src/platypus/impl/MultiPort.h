@@ -35,7 +35,7 @@ public:
     Stream *beginSerial(int baud, SerialMode mode,
                         bool tx_enabled=true, bool rx_enabled=true) override;
     void endSerial() override;
-    Stream &serial() const override;
+    Stream &serial() override;
 
     int beginAnalog(float scale=1.0, float offset=0.0,
                     float min_val=-std::numeric_limits<float>::infinity(),
@@ -50,8 +50,6 @@ public:
 
     void power(bool isPowered) override;
     bool isPowered() const override;
-    void powerOn() override;
-    void powerOff() override;
 
     float current() const override;
 

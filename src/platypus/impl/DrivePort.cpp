@@ -102,16 +102,6 @@ void DrivePort::drivePower(bool isPowered)
         digitalWrite(port_->drive_enable, isPowered);
 }
 
-void DrivePort::drivePowerOn()
-{
-    this->drivePower(true);
-}
-
-void DrivePort::drivePowerOff()
-{
-    this->drivePower(false);
-}
-
 bool DrivePort::isServoPowered() const
 {
     return isServoPowered_;
@@ -125,16 +115,6 @@ void DrivePort::servoPower(bool isPowered)
     // Only set the power setting if this port is active.
     if (port_)
         digitalWrite(port_->drive_enable, isPowered);
-}
-
-void DrivePort::servoPowerOn()
-{
-    this->servoPower(true);
-}
-
-void DrivePort::servoPowerOff()
-{
-    this->servoPower(false);
 }
         
 float DrivePort::current() const

@@ -4,17 +4,17 @@ using namespace platypus;
 
 void VaporPro::arm()
 {
-    disable();
+    port_.drivePowerOff();
     delay(500);
-    enable();
+    port_.drivePowerOn();
 
-    velocity(1.0);
+    port_.command(1.0);
     delay(5500);
 
-    velocity(-1.0);
+    port_.command(-1.0);
     delay(3500);
 
-    velocity(0.0);
+    port_.command(0.0);
     delay(8500);
 }
 
@@ -25,14 +25,14 @@ const String &VaporPro::name() const
 
 void HobbyKingBoat::arm()
 {
-    disable();
+    port_.drivePowerOff();
     delay(1000);
 
-    velocity(1.0);
-    enable();
+    port_.command(1.0);
+    port_.drivePowerOn();
     delay(3000);
 
-    velocity(0.0);
+    port_.command(0.0);
     delay(3000);
 }
 
@@ -43,14 +43,14 @@ const String &HobbyKingBoat::name() const
 
 void SeaKing::arm()
 {
-    disable();
+    port_.drivePowerOff();
     delay(500);
 
-    velocity(1.0);
-    enable();
+    port_.command(1.0);
+    port_.drivePowerOn();
     delay(3000);
 
-    velocity(0.0);
+    port_.command(0.0);
     delay(2000);
 }
 
@@ -61,14 +61,14 @@ const String &SeaKing::name() const
 
 void Swordfish::arm()
 {
-    disable();
+    port_.drivePowerOff();
     delay(500);
 
-    velocity(1.0);
-    enable();
+    port_.command(1.0);
+    port_.drivePowerOn();
     delay(5000);
 
-    velocity(0.0);
+    port_.command(0.0);
     delay(3000);
 }
 
