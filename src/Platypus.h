@@ -257,8 +257,11 @@ public:
     virtual void arm();
     virtual void disarm();
     virtual const String &name() const = 0;
+    virtual bool set(const String &param, const String &value);
 
 protected:
+    DrivePort &port_;
+
     DriveModule() = default;
     virtual ~DriveModule() = 0;
 
@@ -282,6 +285,8 @@ public:
     virtual const String &name() const = 0;
 
 protected:
+    MultiPort &port_;
+
     MultiModule() = default;
     virtual ~MultiModule() = 0;
 

@@ -4,6 +4,37 @@
 
 using namespace platypus;
 
+void DriveModule::begin(DrivePort &port)
+{
+	// Do nothing.
+}
+
+void DriveModule::end()
+{
+	disarm();
+}
+
+void DriveModule::loop()
+{
+	// Do nothing.
+}
+
+void DriveModule::arm()
+{
+	// Do nothing.
+}
+
+void DriveModule::disarm()
+{
+	// Do nothing.
+}
+
+bool DriveModule::set(const String &param, const String &value)
+{
+	// By default, don't accept any commands.
+	return false;
+}
+
 /** 
  * Creates a single instance of the controller singleton.
  * This instance is used within all instantiated controllers. 

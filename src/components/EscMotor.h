@@ -8,29 +8,29 @@ namespace platypus
     class VaporPro : public DriveModule 
     {
     public:
-        VaporPro(int channel) : Motor(channel) {}
         void arm();
+        const String &name() const override;
     };
 
     class HobbyKingBoat : public DriveModule 
     {
     public:
-        HobbyKingBoat(int channel) : Motor(channel) {}
         void arm();
+        const String &name() const override;
     };
     
-    class Seaking : public DriveModule 
+    class SeaKing : public DriveModule 
     {
     public:
-        Seaking(int channel) : Motor(channel) {}
         void arm();
+        const String &name() const override;
     };
 
     class Swordfish : public DriveModule 
     {
     public:
-        Swordfish(int channel) : Motor(channel) {}
         void arm();
+        const String &name() const override;
     };
 }
 
