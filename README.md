@@ -1,5 +1,6 @@
 Platypus Arduino Library
 ========================
+[![Build Status](https://travis-ci.org/platypusllc/arduino.svg)](https://travis-ci.org/platypusllc/arduino)
 
 > :warning: This library is still in development.  Please do not use this yet for any active projects.
 
