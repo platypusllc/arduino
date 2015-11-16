@@ -1,0 +1,46 @@
+# Tests building of example application in Arduino.
+language: cpp
+env:
+ # Test against the Arduino DUE.
+ - BOARD=arduino:sam:arduino_due_x NAME=ExampleFirmware ARDUINO_VERSION=1.6.5
+
+compiler:
+ - gcc
+
+addons:
+  apt:
+    packages:
+    - openjdk-6-jre
+    - avr-libc
+    - gcc-avr
+    - xvfb
+
+install:
+ # Arduino IDE + build tools.
+ - wget http://downloads-02.arduino.cc/arduino-$ARDUINO_VERSION-linux64.tar.xz
+ - tar -xf arduino-$ARDUINO_VERSION-linux64.tar.xz
+ - mv arduino-$ARDUINO_VERSION/ $HOME/arduino_ide
+ # Arduino requires an X server even with command line:
+ # https://github.com/arduino/Arduino/blob/master/build/shared/manpage.adoc#bugs
+ - Xvfb :1 -nolisten tcp -screen :1 1280x800x24 &> xvfb.log &
+ - export XVFB_PID="$!"
+ # Install necessary board support packages.
+ - DISPLAY=:1 $HOME/arduino_ide/arduino --install-boards "arduino:sam" > /dev/null 2>&1
+ - DISPLAY=:1 $HOME/arduino_ide/arduino --install-library "USBHost" > /dev/null 2>&1
+ - DISPLAY=:1 $HOME/arduino_ide/arduino --install-library "Scheduler" > /dev/null 2>&1
+ - kill -9 $XVFB_PID
+
+before_script:
+ # Arduino requires an X server even with command line:
+ # https://github.com/arduino/Arduino/blob/master/build/shared/manpage.adoc#bugs
+ - Xvfb :1 -nolisten tcp -screen :1 1280x800x24 &> xvfb.log &
+ - export XVFB_PID="$!"
+ # Put source files in a folder under a new libraries folder.
+ - mkdir -p $HOME/Arduino/libraries
+ - ln -s $TRAVIS_BUILD_DIR $HOME/Arduino/libraries/platypus
+
+script:
+ - DISPLAY=:1 $HOME/arduino_ide/arduino --board $BOARD --verbose --verify $HOME/Arduino/libraries/platypus/examples/$NAME/$NAME.ino
+
+after_script:
+ - kill -9 $XVFB_PID
